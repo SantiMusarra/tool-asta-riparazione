@@ -541,6 +541,9 @@
             gap: 5px;
             flex-wrap: wrap;
             border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 68px; /* altezza header */
+            z-index: 99;
         }
         
         .tab {
@@ -1110,6 +1113,7 @@
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            align-items: flex-end;
             margin-bottom: 20px;
             padding: 15px;
             background: var(--bg-card);
@@ -1121,11 +1125,13 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            flex: 0 0 auto;
         }
         
         .filter-group label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
+            white-space: nowrap;
         }
         
         .filter-group input,
@@ -1135,13 +1141,22 @@
             border-radius: 5px;
             background: var(--bg-secondary);
             color: var(--text-primary);
-            min-width: 150px;
+            min-width: 120px;
+            height: 38px;
+            box-sizing: border-box;
         }
         
         .filter-group input:focus,
         .filter-group select:focus {
             outline: none;
             border-color: var(--accent);
+        }
+        
+        .btn-reset-filters {
+            height: 38px;
+            padding: 0 12px;
+            font-size: 0.85rem;
+            white-space: nowrap;
         }
         
         /* Config section */
@@ -1529,6 +1544,7 @@
                 gap: 5px;
                 flex-wrap: wrap;
                 justify-content: center;
+                top: 110px; /* header più alto su mobile */
             }
             
             .tab {
@@ -1675,7 +1691,7 @@
                         <li>Segna preferiti e giocatori già presi</li>
                         <li>Visualizza infortunati e nuovi arrivi</li>
                     </ul>
-                    <p class="features-privacy">🔒 Tutto nel browser, nessun dato online.</p>
+                    <p class="features-privacy">🔒 Tutto nel browser, nessun dato online.<br><small style="opacity: 0.8;">I dati non si sincronizzano tra dispositivi diversi.</small></p>
                 </div>
                 
                 <div class="upload-zone" id="upload-zone">
@@ -1692,7 +1708,7 @@
                 <h4>📥 Come ottenere il file della tua lega</h4>
                 <ol class="instructions-list">
                     <li>
-                        Accedi a <a href="https://leghe.fantacalcio.it/login" target="_blank">leghe.fantacalcio.it</a> e seleziona la tua <strong>lega</strong> dal menu in alto, poi clicca su <strong>Lista Calciatori</strong>
+                        Apri il <strong>sito web</strong> <a href="https://leghe.fantacalcio.it/login" target="_blank">leghe.fantacalcio.it</a> (non l'app!) e seleziona la tua <strong>lega</strong> dal menu in alto, poi clicca su <strong>Lista Calciatori</strong>
                         <div class="instruction-screenshot">
                             <img src="screenshots/step1-menu-lega.png" alt="Step 1: Seleziona lega e Lista Calciatori" loading="lazy">
                         </div>
@@ -2060,6 +2076,14 @@
             'D': 'Difensori',
             'C': 'Centrocampisti',
             'A': 'Attaccanti'
+        };
+        
+        // Traccia l'ordinamento corrente per ogni tab
+        const currentSort = {
+            portieri: { col: 'pgv', dir: 'desc' },
+            difensori: { col: 'pgv', dir: 'desc' },
+            centrocampisti: { col: 'pgv', dir: 'desc' },
+            attaccanti: { col: 'pgv', dir: 'desc' }
         };
         
         // Storage keys are now dynamic based on lega name
@@ -3586,6 +3610,9 @@
                     </select>
                 </div>
                 ` : ''}
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <button class="btn btn-secondary btn-reset-filters" onclick="resetFilters('${ruolo}', '${tabId}')" title="Pulisci tutti i filtri">✖ Pulisci filtri</button>
+                </div>
             `;
         }
         
@@ -3736,7 +3763,9 @@
                 appData.preferenze[nome] = value;
             }
             savePreferenze();
-            renderSvincolatiTable(ruolo, tabId);
+            // Usa l'ordinamento corrente salvato
+            const sort = currentSort[tabId] || { col: 'pgv', dir: 'desc' };
+            renderSvincolatiTable(ruolo, tabId, sort.col, sort.dir);
         }
         
         function toggleAcquistato(nome) {
@@ -3758,7 +3787,45 @@
             renderSvincolatiTable(ruolo, tabId);
         }
         
+        function resetFilters(ruolo, tabId) {
+            // Reset tutti i campi filtro ai valori di default
+            const search = document.getElementById(`filter-search-${tabId}`);
+            if (search) search.value = '';
+            
+            const squadra = document.getElementById(`filter-squadra-${tabId}`);
+            if (squadra) squadra.value = '';
+            
+            const fm = document.getElementById(`filter-fm-${tabId}`);
+            if (fm) fm.value = '';
+            
+            const pgv = document.getElementById(`filter-pgv-${tabId}`);
+            if (pgv) pgv.value = '';
+            
+            const preferiti = document.getElementById(`filter-preferiti-${tabId}`);
+            if (preferiti) preferiti.value = '';
+            
+            const nuoviArrivi = document.getElementById(`filter-nuoviarrivi-${tabId}`);
+            if (nuoviArrivi) nuoviArrivi.value = '';
+            
+            const rilasciati = document.getElementById(`filter-rilasciati-${tabId}`);
+            if (rilasciati) rilasciati.value = '';
+            
+            const acquistati = document.getElementById(`filter-acquistati-${tabId}`);
+            if (acquistati) acquistati.value = '0'; // Default: nascondi acquistati
+            
+            const infortunati = document.getElementById(`filter-infortunati-${tabId}`);
+            if (infortunati) infortunati.value = '';
+            
+            // Reset anche l'ordinamento al default
+            currentSort[tabId] = { col: 'pgv', dir: 'desc' };
+            
+            // Ri-renderizza la tabella
+            filterTable(ruolo, tabId);
+        }
+        
         function sortSvincolatiTable(ruolo, tabId, col, dir) {
+            // Salva l'ordinamento corrente
+            currentSort[tabId] = { col, dir };
             renderSvincolatiTable(ruolo, tabId, col, dir);
         }
         
