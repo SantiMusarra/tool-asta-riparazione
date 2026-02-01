@@ -1,0 +1,2981 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Asta di Riparazione - Fantacalcio Tool</title>
+    <!-- SheetJS per leggere Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #252542;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b8;
+            --accent: #6c5ce7;
+            --accent-hover: #a29bfe;
+            --accent-secondary: #00cec9;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --border: #3d3d5c;
+            --gold: #f1c40f;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        /* ===== WELCOME PAGE ===== */
+        #welcome-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: 
+                radial-gradient(ellipse at center, rgba(108, 92, 231, 0.1) 0%, transparent 70%),
+                linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+        
+        .welcome-container {
+            text-align: center;
+            max-width: 700px;
+        }
+        
+        .welcome-logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .welcome-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+        
+        .upload-zone {
+            border: 3px dashed var(--accent);
+            border-radius: 20px;
+            padding: 60px 40px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--accent-secondary);
+            background: rgba(108, 92, 231, 0.1);
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(108, 92, 231, 0.3);
+        }
+        
+        .upload-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .upload-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .instructions-box {
+            margin-top: 30px;
+            padding: 25px;
+            background: var(--bg-card);
+            border-radius: 15px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .instructions-box h4 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions-list {
+            list-style: none;
+            counter-reset: steps;
+        }
+        
+        .instructions-list li {
+            counter-increment: steps;
+            padding: 10px 0;
+            padding-left: 45px;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .instructions-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .instructions-list li::before {
+            content: counter(steps);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        .instructions-list li a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .instructions-list li a:hover {
+            text-decoration: underline;
+            color: var(--accent-hover);
+        }
+        
+        .instructions-list li code {
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--warning);
+            font-size: 0.9rem;
+        }
+        
+        .file-format {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            text-align: left;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .file-format h4 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .file-format ul {
+            list-style: none;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .file-format li {
+            padding: 3px 0;
+        }
+        
+        .file-format li::before {
+            content: "✓ ";
+            color: var(--success);
+        }
+        
+        .disclaimer {
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: rgba(233, 69, 96, 0.15);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--danger);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+        }
+        
+        .disclaimer-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            color: var(--danger);
+            display: none;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--bg-card);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+        
+        /* ===== MAIN APP ===== */
+        #main-app {
+            display: none;
+        }
+        
+        #main-app.active {
+            display: block;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, var(--bg-secondary), var(--bg-card));
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .file-info {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 15px rgba(0, 179, 65, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--bg-secondary);
+            padding: 0 20px;
+            gap: 5px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+            background: rgba(0, 179, 65, 0.1);
+        }
+        
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        
+        /* Content */
+        .content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Config Hint Box */
+        .config-hint-box {
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.15), rgba(0, 206, 201, 0.1));
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .config-hint-box span:first-child {
+            font-size: 1.5rem;
+        }
+        
+        .btn-config-link {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+        
+        .btn-config-link:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        /* Mobile Warning */
+        .mobile-warning {
+            border-color: var(--warning);
+            background: rgba(253, 203, 110, 0.1);
+        }
+        
+        /* Privacy Notice */
+        .privacy-notice {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.1);
+        }
+        
+        /* File Naming */
+        .file-naming {
+            border-color: var(--accent);
+            background: rgba(108, 92, 231, 0.1);
+        }
+        
+        .file-naming code {
+            background: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        
+        /* Legenda */
+        .legenda-box {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .legenda-box h4 {
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+        
+        .legenda-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 25px;
+        }
+        
+        .legenda-item {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: rgba(108, 92, 231, 0.1);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .info-box .info-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        /* Help Text */
+        .help-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Optional Badge */
+        .optional-badge {
+            background: var(--text-secondary);
+            color: var(--bg-primary);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+            font-weight: normal;
+            vertical-align: middle;
+        }
+        
+        /* Mercato Details */
+        .mercato-details {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .mercato-details summary {
+            padding: 15px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--accent);
+            list-style: none;
+        }
+        
+        .mercato-details summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .mercato-details summary::before {
+            content: "▶ ";
+            font-size: 0.8rem;
+        }
+        
+        .mercato-details[open] summary::before {
+            content: "▼ ";
+        }
+        
+        .mercato-details[open] > *:not(summary) {
+            padding: 0 15px 15px;
+        }
+        
+        /* Privacy inline box in Svincoli tab */
+        .privacy-inline {
+            background: rgba(0, 184, 148, 0.1);
+            border-color: var(--success);
+        }
+        
+        /* Budget Cards */
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .budget-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .budget-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+        
+        .budget-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .budget-row.total {
+            border-top: 1px solid var(--border);
+            margin-top: 10px;
+            padding-top: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .budget-row.total .value {
+            color: var(--success);
+        }
+        
+        .budget-total-lega {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.15);
+        }
+        
+        .budget-total-lega h2 {
+            color: var(--gold);
+            font-size: 1.8rem;
+        }
+        
+        /* Quick Search */
+        .quick-search-container {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .quick-search-container h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .quick-search-wrapper {
+            display: flex;
+            gap: 10px;
+            position: relative;
+        }
+        
+        .quick-search-wrapper input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .quick-search-wrapper input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 179, 65, 0.3);
+        }
+        
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 80px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        
+        .autocomplete-list.show {
+            display: block;
+        }
+        
+        .autocomplete-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .autocomplete-item:hover {
+            background: var(--bg-card);
+        }
+        
+        .autocomplete-item.svincolato {
+            background: rgba(0, 206, 201, 0.1);
+            border-left: 3px solid var(--secondary);
+        }
+        
+        .autocomplete-item.svincolato:hover {
+            background: rgba(0, 206, 201, 0.2);
+        }
+        
+        .autocomplete-item .squadra {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Squadra sections */
+        .squadra-section {
+            background: var(--bg-card);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .squadra-header {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, var(--bg-secondary), var(--bg-card));
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .squadra-header:hover {
+            background: linear-gradient(90deg, var(--bg-card), var(--bg-secondary));
+        }
+        
+        .squadra-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+        }
+        
+        .squadra-header .counter {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: normal;
+        }
+        
+        .squadra-header .toggle-icon {
+            transition: transform 0.3s;
+            color: var(--accent);
+        }
+        
+        .squadra-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .squadra-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .squadra-content.collapsed {
+            max-height: 0;
+        }
+        
+        .squadra-actions {
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .btn-reset:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            color: var(--accent);
+        }
+        
+        th:hover {
+            background: var(--bg-card);
+        }
+        
+        th .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        
+        th.sorted .sort-icon {
+            opacity: 1;
+        }
+        
+        tr:hover {
+            background: rgba(108, 92, 231, 0.08);
+        }
+        
+        tr.fuori-lista {
+            background: rgba(214, 48, 49, 0.15);
+        }
+        
+        tr.svincolato {
+            background: rgba(255, 215, 0, 0.15);
+        }
+        
+        tr.preferito {
+            background: rgba(108, 92, 231, 0.1);
+        }
+        
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+        
+        /* Stars Rating */
+        .stars-cell {
+            white-space: nowrap;
+        }
+        
+        .stars-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .star {
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #555;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        
+        .star:hover {
+            transform: scale(1.2);
+        }
+        
+        .star.filled {
+            color: var(--gold);
+            text-shadow: 0 0 5px rgba(241, 196, 15, 0.5);
+        }
+        
+        .star-clear {
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--danger);
+            margin-left: 5px;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+        }
+        
+        .star-clear:hover {
+            opacity: 1;
+        }
+        
+        /* Riepilogo svincoli */
+        .riepilogo-svincoli {
+            background: var(--bg-card);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--warning);
+        }
+        
+        .riepilogo-header {
+            padding: 15px 20px;
+            background: rgba(253, 203, 110, 0.1);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .riepilogo-header h3 {
+            color: var(--warning);
+        }
+        
+        .riepilogo-content {
+            padding: 15px 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .riepilogo-content.collapsed {
+            max-height: 0;
+            padding: 0 20px;
+            overflow: hidden;
+        }
+        
+        .riepilogo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .riepilogo-item:last-child {
+            border-bottom: none;
+        }
+        
+        .riepilogo-empty {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-width: 150px;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Config section */
+        .config-section {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .config-section h3 {
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .config-item label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .config-item input {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .config-item select {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .config-item input:focus,
+        .config-item select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .config-help {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+        
+        .config-actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        /* Mercato upload */
+        .mercato-instructions {
+            background: rgba(108, 92, 231, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .mercato-instructions h4 {
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .mercato-instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .mercato-instructions li {
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+        }
+        
+        .mercato-instructions kbd {
+            background: var(--bg-main);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            border: 1px solid var(--border);
+        }
+        
+        .mercato-upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mercato-upload-zone:hover {
+            border-color: var(--accent);
+            background: rgba(108, 92, 231, 0.05);
+        }
+        
+        .mercato-upload-zone .upload-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .nuovo-arrivo-badge {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: bold;
+            animation: pulse-badge 2s infinite;
+        }
+        
+        .rilasciato-badge {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+        
+        tr.rilasciato {
+            background: rgba(108, 92, 231, 0.1) !important;
+        }
+        
+        /* Giocatori acquistati da altri */
+        tr.acquistato {
+            opacity: 0.5;
+            background: rgba(128, 128, 128, 0.1) !important;
+        }
+        
+        tr.acquistato td {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+        
+        tr.acquistato td.no-strike {
+            text-decoration: none;
+        }
+        
+        .acquistato-badge {
+            background: linear-gradient(135deg, #636e72, #b2bec3);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+        
+        .btn-acquistato {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-acquistato:hover {
+            background: var(--bg-hover);
+        }
+        
+        .btn-acquistato.active {
+            background: #636e72;
+            color: white;
+            border-color: #636e72;
+        }
+        
+        @keyframes pulse-badge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .mercato-preview {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border);
+        }
+        
+        .mercato-preview h4 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .mercato-preview-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .mercato-preview-item {
+            background: rgba(0, 206, 201, 0.15);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .stats-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .stats-card h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .budget-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .table-wrapper {
+                font-size: 0.85rem;
+            }
+            
+            .table-wrapper th,
+            .table-wrapper td {
+                padding: 8px 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 1.8rem;
+            }
+            
+            .upload-zone {
+                padding: 40px 20px;
+            }
+            
+            .tabs {
+                padding: 0 5px;
+                gap: 5px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .tab {
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group input,
+            .filter-group select {
+                width: 100%;
+            }
+            
+            .instructions-list li {
+                font-size: 0.85rem;
+            }
+            
+            .config-hint-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .btn-config-link {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            .legenda-items {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-search-wrapper {
+                flex-direction: column;
+            }
+            
+            .quick-search-wrapper input {
+                width: 100%;
+            }
+            
+            .quick-search-wrapper button {
+                width: 100%;
+            }
+            
+            .info-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            /* Tabelle scrollabili orizzontalmente */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .table-wrapper table {
+                min-width: 700px;
+            }
+            
+            .squadra-table-container {
+                overflow-x: auto;
+            }
+            
+            .squadra-table-container table {
+                min-width: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tab {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+            }
+            
+            .welcome-logo {
+                font-size: 50px;
+            }
+            
+            .welcome-title {
+                font-size: 1.4rem;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1rem;
+            }
+            
+            .disclaimer {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Elaborazione in corso...</div>
+    </div>
+
+    <!-- Welcome Page -->
+    <div id="welcome-page">
+        <div class="welcome-container">
+            <div class="welcome-logo">⚽</div>
+            <h1 class="welcome-title">Asta di Riparazione</h1>
+            <p class="welcome-subtitle">Gestisci svincoli e budget della tua lega Fantacalcio</p>
+            
+            <div class="upload-zone" id="upload-zone">
+                <input type="file" id="file-input" accept=".xlsx,.xls">
+                <div class="upload-icon">📂</div>
+                <div class="upload-text">Trascina qui il file Excel della tua lega</div>
+                <div class="upload-hint">oppure clicca per selezionarlo</div>
+            </div>
+            
+            <div class="error-message" id="error-message"></div>
+            
+            <div class="instructions-box">
+                <h4>📥 Come ottenere il file della tua lega</h4>
+                <ol class="instructions-list">
+                    <li>Accedi a <a href="https://leghe.fantacalcio.it/" target="_blank">leghe.fantacalcio.it</a></li>
+                    <li>Seleziona la <strong>lega</strong> che ti interessa</li>
+                    <li>Vai nella sezione <code>Lista Svincolati</code></li>
+                    <li>Togli la spunta dalla checkbox <code>Solo svincolati</code></li>
+                    <li>Clicca su <strong>Scarica</strong> → seleziona <code>Lista completa</code></li>
+                </ol>
+            </div>
+            
+            <div class="file-format">
+                <h4>📋 Colonne richieste nel file</h4>
+                <ul>
+                    <li>Nome, R. (Ruolo), Sq. (Squadra Serie A)</li>
+                    <li>FantaSquadra (vuota se svincolato)</li>
+                    <li>PGv, MV, FM, QUOT., Costo</li>
+                    <li>Fuori lista (* = non disponibile)</li>
+                </ul>
+            </div>
+            
+            <div class="disclaimer">
+                <span class="disclaimer-icon">⚠️</span>
+                <span>
+                    <strong>Nota:</strong> Questo tool è ottimizzato per la modalità <strong>Classic</strong>. 
+                    La modalità <strong>Mantra</strong> potrebbe non essere completamente supportata a causa 
+                    delle differenze nei ruoli e nelle regole.
+                </span>
+            </div>
+            
+            <div class="disclaimer privacy-notice">
+                <span class="disclaimer-icon">🔒</span>
+                <span>
+                    <strong>Privacy:</strong> Tutti i dati vengono elaborati <strong>localmente nel tuo browser</strong>. 
+                    Nessun file viene inviato a server esterni. I tuoi svincoli e preferenze sono salvati nel browser 
+                    e associati al nome della tua lega.
+                </span>
+            </div>
+            
+            <div class="disclaimer file-naming">
+                <span class="disclaimer-icon">📁</span>
+                <span>
+                    <strong>Nome file:</strong> Per funzionare correttamente, il nome del file deve contenere il nome della lega 
+                    dopo l'ultimo underscore (es: <code>lista_calciatori_..._nome-lega.xlsx</code>). 
+                    Se scarichi il file direttamente da <a href="https://leghe.fantacalcio.it/" target="_blank" style="color: var(--accent);">leghe.fantacalcio.it</a> senza rinominarlo, funzionerà automaticamente!
+                </span>
+            </div>
+            
+            <div class="disclaimer mobile-warning">
+                <span class="disclaimer-icon">📱</span>
+                <span>
+                    <strong>Avviso:</strong> Questo tool è ottimizzato per l'uso su <strong>desktop/laptop</strong>. 
+                    Su smartphone l'esperienza potrebbe essere limitata a causa delle tabelle estese e dei filtri multipli.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app">
+        <header class="header">
+            <h1>🎯 Asta di Riparazione <span id="lega-name-display" style="font-size: 0.7em; color: var(--secondary); font-weight: normal;"></span></h1>
+            <div class="header-actions">
+                <span class="file-info" id="file-info"></span>
+                <button class="btn btn-secondary" onclick="changeFile()">📁 Cambia File</button>
+                <button class="btn btn-secondary" onclick="resetAllData()" title="Cancella tutti i dati salvati">🗑️ Reset Dati</button>
+            </div>
+        </header>
+        
+        <nav class="tabs" id="tabs">
+            <button class="tab active" data-tab="svincoli">🏠 Home</button>
+            <button class="tab" data-tab="config">⚙️ Configurazione</button>
+            <button class="tab" data-tab="portieri">🧤 Portieri</button>
+            <button class="tab" data-tab="difensori">🛡️ Difensori</button>
+            <button class="tab" data-tab="centrocampisti">⚽ Centrocampisti</button>
+            <button class="tab" data-tab="attaccanti">🎯 Attaccanti</button>
+        </nav>
+        
+        <main class="content">
+            <!-- Tab Svincoli -->
+            <div class="tab-content active" id="tab-svincoli">
+                <div class="config-hint-box" id="config-hint-cta">
+                    <span>⚙️</span>
+                    <span>Vai nella tab <strong>Configurazione</strong> per impostare budget personalizzati e caricare i nuovi arrivi dal mercato</span>
+                    <button class="btn-config-link" onclick="switchToTab('config')">Vai a Configurazione →</button>
+                </div>
+                
+                <div class="info-box privacy-inline">
+                    <span class="info-icon">🔒</span>
+                    <span>I tuoi dati restano nel browser. Svincoli e preferenze sono salvati localmente e associati alla lega "<strong id="lega-name-inline"></strong>".</span>
+                </div>
+                
+                <div class="legenda-box">
+                    <h4>📖 Legenda Simboli</h4>
+                    <div class="legenda-items">
+                        <span class="legenda-item">⚠️ Fuori Lista (non acquistabile)</span>
+                        <span class="legenda-item"><span class="nuovo-arrivo-badge">NEW</span> Nuovo acquisto dal mercato</span>
+                        <span class="legenda-item">🔓 Già svincolato (ricerca rapida)</span>
+                        <span class="legenda-item">⭐ Preferenza personale (1-5 stelle)</span>
+                        <span class="legenda-item" style="color: var(--success)">✅ Riga verde = giocatore svincolato</span>
+                        <span class="legenda-item"><span class="acquistato-badge">PRESO</span> Acquistato da un'altra squadra</span>
+                    </div>
+                </div>
+                
+                <div class="budget-grid" id="budget-grid"></div>
+                
+                <div class="quick-search-container">
+                    <h3>🔍 Ricerca Rapida Svincolo</h3>
+                    <p class="help-text">Cerca un calciatore per nome e clicca il pulsante per svincolarlo/annullare lo svincolo rapidamente.</p>
+                    <div class="quick-search-wrapper">
+                        <input type="text" id="quick-search" placeholder="Cerca calciatore da svincolare...">
+                        <button class="btn btn-primary" id="quick-svincola-btn" onclick="quickSvincola()">⚡ Svincola</button>
+                        <div class="autocomplete-list" id="autocomplete-list"></div>
+                    </div>
+                </div>
+                
+                <div class="riepilogo-svincoli">
+                    <div class="riepilogo-header" onclick="toggleRiepilogo()">
+                        <h3>📋 Riepilogo Svincoli (<span id="count-svincoli">0</span>)</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <p class="help-text" style="padding: 0 15px;">Elenco di tutti i calciatori svincolati con il rimborso calcolato secondo le regole configurate.</p>
+                    <div class="riepilogo-content" id="riepilogo-content"></div>
+                </div>
+                
+                <div id="squadre-container"></div>
+            </div>
+            
+            <!-- Tab Config -->
+            <div class="tab-content" id="tab-config">
+                <div class="config-section">
+                    <h3>⚙️ Impostazioni Lega</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Budget Iniziale (per squadra)</label>
+                            <input type="number" id="config-budget-iniziale" value="500">
+                        </div>
+                        <div class="config-item">
+                            <label>Crediti Aggiuntivi Riparazione</label>
+                            <input type="number" id="config-crediti-aggiuntivi" value="50">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h3>💸 Regole Rimborso Svincoli</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">
+                        Configura come vengono calcolati i rimborsi per i giocatori svincolati.
+                    </p>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Rimborso Standard (%)</label>
+                            <select id="config-rimborso-percentuale">
+                                <option value="50">50% (metà del costo)</option>
+                                <option value="100">100% (costo intero)</option>
+                                <option value="0">0% (nessun rimborso)</option>
+                                <option value="25">25%</option>
+                                <option value="75">75%</option>
+                            </select>
+                            <span class="config-help">Percentuale rimborsata per i giocatori svincolati normalmente</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Rimborso Fuori Lista (%)</label>
+                            <select id="config-rimborso-fuorilista">
+                                <option value="100">100% (costo intero)</option>
+                                <option value="50">50% (metà del costo)</option>
+                                <option value="0">0% (nessun rimborso)</option>
+                            </select>
+                            <span class="config-help">Percentuale rimborsata se il giocatore è fuori lista (⚠️)</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Arrotondamento</label>
+                            <select id="config-arrotondamento">
+                                <option value="floor">Per difetto (⬇ es: 3.5 → 3)</option>
+                                <option value="ceil">Per eccesso (⬆ es: 3.5 → 4)</option>
+                                <option value="round">Matematico (↔ es: 3.5 → 4, 3.4 → 3)</option>
+                            </select>
+                            <span class="config-help">Come arrotondare i crediti quando non sono interi</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h3>💰 Budget Residuo per Squadra</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">
+                        Calcolato automaticamente come: Budget Iniziale - Costo Rosa.<br>
+                        Puoi modificare manualmente se necessario.
+                    </p>
+                    <button class="btn btn-secondary" onclick="recalcBudgetSquadre()" style="margin-bottom: 15px;">
+                        🔄 Ricalcola Budget (usa Budget Iniziale attuale)
+                    </button>
+                    <div class="config-grid" id="config-squadre-grid"></div>
+                </div>
+                
+                <div class="config-actions">
+                    <button class="btn btn-primary" onclick="saveConfig()">💾 Salva Configurazione</button>
+                    <button class="btn btn-secondary" onclick="resetConfig()">🔄 Reset Default</button>
+                </div>
+                
+                <div class="config-section" style="margin-top: 30px;">
+                    <h3>🆕 Nuovi Arrivi dal Mercato <span class="optional-badge">Opzionale</span></h3>
+                    <div class="info-box" style="margin-bottom: 15px;">
+                        <span class="info-icon">ℹ️</span>
+                        <span>
+                            <strong>A cosa serve?</strong> Caricando i trasferimenti di mercato, i giocatori appena acquistati 
+                            dalle squadre di Serie A verranno evidenziati con un badge <span class="nuovo-arrivo-badge" style="font-size: 0.7rem;">NEW</span> 
+                            nelle tabelle. Questo ti aiuta a identificare rapidamente i nuovi arrivi che potrebbero essere 
+                            interessanti per l'asta di riparazione.
+                        </span>
+                    </div>
+                    <details class="mercato-details">
+                        <summary>📥 Clicca per caricare i trasferimenti</summary>
+                        <div class="mercato-instructions">
+                            <h4>Come fare:</h4>
+                            <ol>
+                                <li>Vai su <a href="https://www.fantacalcio.it/calciomercato/trasferimenti-ufficiali" target="_blank" style="color: var(--accent);">fantacalcio.it/trasferimenti-ufficiali</a></li>
+                                <li>Premi <kbd>Cmd+S</kbd> (Mac) o <kbd>Ctrl+S</kbd> (Windows)</li>
+                                <li>Salva come "Pagina web, solo HTML" (.html)</li>
+                                <li>Carica il file qui sotto</li>
+                            </ol>
+                        </div>
+                        <div class="mercato-upload-zone" id="mercato-upload-zone">
+                            <input type="file" id="mercato-file-input" accept=".html,.htm" style="display: none;">
+                            <div class="upload-content" onclick="document.getElementById('mercato-file-input').click()">
+                                <span class="upload-icon">📥</span>
+                                <span>Clicca per caricare il file HTML dei trasferimenti</span>
+                            </div>
+                        </div>
+                        <div id="mercato-status" style="margin-top: 10px;"></div>
+                        <div id="mercato-preview" style="margin-top: 15px;"></div>
+                    </details>
+                </div>
+            </div>
+            
+            <!-- Tab Portieri -->
+            <div class="tab-content" id="tab-portieri">
+                <h2 style="margin-bottom: 10px;">🧤 Portieri Svincolati</h2>
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <span><strong>Indice Affidabilità</strong> = PGv × FM. Più alto = giocatore che gioca spesso e performa bene.</span>
+                </div>
+                <div class="filters" id="filters-portieri"></div>
+                <div id="table-portieri"></div>
+            </div>
+            
+            <!-- Tab Difensori -->
+            <div class="tab-content" id="tab-difensori">
+                <h2 style="margin-bottom: 10px;">🛡️ Difensori Svincolati</h2>
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <span><strong>Indice Affidabilità</strong> = PGv × FM. Più alto = giocatore che gioca spesso e performa bene.</span>
+                </div>
+                <div class="filters" id="filters-difensori"></div>
+                <div id="table-difensori"></div>
+            </div>
+            
+            <!-- Tab Centrocampisti -->
+            <div class="tab-content" id="tab-centrocampisti">
+                <h2 style="margin-bottom: 10px;">⚽ Centrocampisti Svincolati</h2>
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <span><strong>Indice Affidabilità</strong> = PGv × FM. Più alto = giocatore che gioca spesso e performa bene.</span>
+                </div>
+                <div class="filters" id="filters-centrocampisti"></div>
+                <div id="table-centrocampisti"></div>
+            </div>
+            
+            <!-- Tab Attaccanti -->
+            <div class="tab-content" id="tab-attaccanti">
+                <h2 style="margin-bottom: 10px;">🎯 Attaccanti Svincolati</h2>
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <span><strong>Indice Affidabilità</strong> = PGv × FM. Più alto = giocatore che gioca spesso e performa bene.</span>
+                </div>
+                <div class="filters" id="filters-attaccanti"></div>
+                <div id="table-attaccanti"></div>
+            </div>
+            
+        </main>
+    </div>
+
+    <script>
+        // ===== GLOBAL STATE =====
+        let appData = {
+            calciatori: [],
+            squadre: {},
+            svincolati: { P: [], D: [], C: [], A: [] },
+            svincoli: {},  // { nomeCalciatore: true }
+            preferenze: {}, // { nomeCalciatore: 1-5 }
+            acquistati: {}, // { nomeCalciatore: true } - giocatori svincolati presi da altri
+            nuoviArrivi: {}, // { squadraSerieA: [nome1, nome2, ...] }
+            config: {
+                budgetIniziale: 500,
+                creditiAggiuntivi: 50,
+                budgetSquadre: {},
+                rimborsoPercentuale: 50,
+                rimborsoFuoriLista: 100,
+                arrotondamento: 'floor' // 'floor' = difetto, 'ceil' = eccesso, 'round' = matematico
+            },
+            fileName: ''
+        };
+        
+        const RUOLI_MAP = {
+            'P': 'Portieri',
+            'D': 'Difensori',
+            'C': 'Centrocampisti',
+            'A': 'Attaccanti'
+        };
+        
+        // Storage keys are now dynamic based on lega name
+        let currentLegaName = null;
+        
+        function getStorageKey(type) {
+            if (!currentLegaName) return null;
+            return `asta_riparazione_${currentLegaName}_${type}`;
+        }
+        
+        function extractLegaName(fileName) {
+            // Remove extension
+            let name = fileName.replace(/\.(xlsx|xls)$/i, '');
+            
+            // Remove version suffixes like " (2)", " (3)", etc.
+            name = name.replace(/\s*\(\d+\)\s*$/, '');
+            
+            // Extract the last part after the last underscore
+            // Examples:
+            // lista_calciatori_lista calciatori_classic_uefa-cosa-nostra -> uefa-cosa-nostra
+            // lista_calciatori_svincolati_classic_pacciofigo -> pacciofigo
+            const parts = name.split('_');
+            if (parts.length > 0) {
+                return parts[parts.length - 1].trim().toLowerCase();
+            }
+            return 'default';
+        }
+        
+        // ===== FILE HANDLING =====
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+        const errorMessage = document.getElementById('error-message');
+        const loading = document.getElementById('loading');
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processFile(file);
+        });
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        
+        async function processFile(file) {
+            hideError();
+            
+            if (!file.name.match(/\.(xlsx|xls)$/i)) {
+                showError('Per favore carica un file Excel (.xlsx o .xls)');
+                return;
+            }
+            
+            loading.classList.add('active');
+            appData.fileName = file.name;
+            
+            // Extract lega name from file for storage keys
+            currentLegaName = extractLegaName(file.name);
+            console.log('Lega rilevata:', currentLegaName);
+            
+            try {
+                const data = await readExcelFile(file);
+                if (data.length === 0) {
+                    throw new Error('Il file è vuoto o non contiene dati validi');
+                }
+                
+                // Validate required columns
+                const requiredCols = ['Nome', 'R.', 'Sq.'];
+                const missingCols = requiredCols.filter(col => !(col in data[0]));
+                if (missingCols.length > 0) {
+                    throw new Error(`Colonne mancanti: ${missingCols.join(', ')}`);
+                }
+                
+                processData(data);
+                loadSavedState();
+                showMainApp();
+                
+            } catch (error) {
+                console.error(error);
+                showError(`Errore: ${error.message}`);
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+        
+        function readExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        resolve(jsonData);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = () => reject(new Error('Errore nella lettura del file'));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        // ===== DATA PROCESSING =====
+        function processData(rawData) {
+            appData.calciatori = rawData.map(row => ({
+                id: row['#'] || 0,
+                nome: row['Nome'] || '',
+                squadra: row['Sq.'] || '',
+                ruolo: row['R.'] || '',
+                pgv: parseFloat(row['PGv']) || 0,
+                mv: parseFloat(row['MV']) || 0,
+                fm: parseFloat(row['FM']) || 0,
+                fvm: parseFloat(row['FVM/1000']) || 0,
+                quot: parseFloat(row['QUOT.']) || 0,
+                fantaSquadra: row['FantaSquadra'] || null,
+                costo: parseFloat(row['Costo']) || 0,
+                fuoriLista: row['Fuori lista'] === '*'
+            }));
+            
+            // Organize by FantaSquadra
+            appData.squadre = {};
+            appData.calciatori.forEach(cal => {
+                if (cal.fantaSquadra) {
+                    if (!appData.squadre[cal.fantaSquadra]) {
+                        appData.squadre[cal.fantaSquadra] = [];
+                    }
+                    appData.squadre[cal.fantaSquadra].push(cal);
+                }
+            });
+            
+            // Calculate costs per squadra
+            const costiPerSquadra = {};
+            Object.keys(appData.squadre).forEach(sq => {
+                costiPerSquadra[sq] = appData.squadre[sq].reduce((sum, cal) => sum + cal.costo, 0);
+            });
+            
+            // Initialize config with calculated budgets
+            Object.keys(appData.squadre).forEach(sq => {
+                appData.config.budgetSquadre[sq] = appData.config.budgetIniziale - costiPerSquadra[sq];
+            });
+            
+            // Build initial svincolati list
+            rebuildSvincolati();
+        }
+        
+        // Rebuild svincolati list including players released by fantasy teams
+        function rebuildSvincolati() {
+            appData.svincolati = { P: [], D: [], C: [], A: [] };
+            
+            // Track which players are already added (to avoid duplicates)
+            const addedPlayers = new Set();
+            
+            // 1. Add players without fantaSquadra (original svincolati)
+            appData.calciatori.forEach(cal => {
+                if (!cal.fantaSquadra && !cal.fuoriLista && cal.ruolo) {
+                    const indiceAffidabilita = (cal.pgv * cal.fm).toFixed(2);
+                    appData.svincolati[cal.ruolo]?.push({
+                        ...cal,
+                        indiceAffidabilita: parseFloat(indiceAffidabilita),
+                        rilasciatoDa: null
+                    });
+                    addedPlayers.add(cal.nome);
+                }
+            });
+            
+            // 2. Add players released by fantasy teams (svincolati)
+            Object.keys(appData.squadre).forEach(sq => {
+                appData.squadre[sq].forEach(cal => {
+                    // If player is svincolato and not fuoriLista, add to available pool
+                    if (appData.svincoli[cal.nome] && !cal.fuoriLista && !addedPlayers.has(cal.nome)) {
+                        const indiceAffidabilita = (cal.pgv * cal.fm).toFixed(2);
+                        appData.svincolati[cal.ruolo]?.push({
+                            ...cal,
+                            indiceAffidabilita: parseFloat(indiceAffidabilita),
+                            rilasciatoDa: sq  // Track which team released them
+                        });
+                        addedPlayers.add(cal.nome);
+                    }
+                });
+            });
+            
+            // Sort by PGv
+            Object.keys(appData.svincolati).forEach(ruolo => {
+                appData.svincolati[ruolo].sort((a, b) => b.pgv - a.pgv);
+            });
+        }
+        
+        // ===== PERSISTENCE =====
+        function loadSavedState() {
+            if (!currentLegaName) return;
+            
+            // Load svincoli
+            const keyS = getStorageKey('svincoli');
+            const savedSvincoli = keyS ? localStorage.getItem(keyS) : null;
+            if (savedSvincoli) {
+                try {
+                    appData.svincoli = JSON.parse(savedSvincoli);
+                    console.log(`Caricati ${Object.keys(appData.svincoli).length} svincoli per lega "${currentLegaName}"`);
+                } catch (e) {
+                    appData.svincoli = {};
+                }
+            }
+            
+            // Load config
+            const keyC = getStorageKey('config');
+            const savedConfig = keyC ? localStorage.getItem(keyC) : null;
+            if (savedConfig) {
+                try {
+                    const parsed = JSON.parse(savedConfig);
+                    appData.config.budgetIniziale = parsed.budgetIniziale || 500;
+                    appData.config.creditiAggiuntivi = parsed.creditiAggiuntivi || 50;
+                    appData.config.rimborsoPercentuale = parsed.rimborsoPercentuale ?? 50;
+                    appData.config.rimborsoFuoriLista = parsed.rimborsoFuoriLista ?? 100;
+                    appData.config.arrotondamento = parsed.arrotondamento || 'floor';
+                    if (parsed.budgetSquadre) {
+                        Object.keys(parsed.budgetSquadre).forEach(sq => {
+                            if (sq in appData.config.budgetSquadre) {
+                                appData.config.budgetSquadre[sq] = parsed.budgetSquadre[sq];
+                            }
+                        });
+                    }
+                    // Nascondo la CTA config se esiste già una configurazione salvata
+                    const configHintCta = document.getElementById('config-hint-cta');
+                    if (configHintCta) configHintCta.style.display = 'none';
+                } catch (e) {
+                    console.error('Error loading config:', e);
+                }
+            }
+            
+            // Load preferenze
+            const keyP = getStorageKey('preferenze');
+            const savedPreferenze = keyP ? localStorage.getItem(keyP) : null;
+            if (savedPreferenze) {
+                try {
+                    appData.preferenze = JSON.parse(savedPreferenze);
+                } catch (e) {
+                    appData.preferenze = {};
+                }
+            }
+            
+            // Load nuovi arrivi
+            const keyNA = getStorageKey('nuoviarrivi');
+            const savedNuoviArrivi = keyNA ? localStorage.getItem(keyNA) : null;
+            if (savedNuoviArrivi) {
+                try {
+                    appData.nuoviArrivi = JSON.parse(savedNuoviArrivi);
+                    console.log(`Caricati nuovi arrivi per ${Object.keys(appData.nuoviArrivi).length} squadre`);
+                } catch (e) {
+                    appData.nuoviArrivi = {};
+                }
+            }
+            
+            // Load acquistati (giocatori presi da altri)
+            const keyAcq = getStorageKey('acquistati');
+            const savedAcquistati = keyAcq ? localStorage.getItem(keyAcq) : null;
+            if (savedAcquistati) {
+                try {
+                    appData.acquistati = JSON.parse(savedAcquistati);
+                    console.log(`Caricati ${Object.keys(appData.acquistati).length} giocatori acquistati da altri`);
+                } catch (e) {
+                    appData.acquistati = {};
+                }
+            }
+            
+            // Rebuild svincolati to include released players
+            if (Object.keys(appData.svincoli).length > 0) {
+                rebuildSvincolati();
+                updateRiepilogoSvincoli();
+            }
+        }
+        
+        function saveSvincoli() {
+            const key = getStorageKey('svincoli');
+            if (key) localStorage.setItem(key, JSON.stringify(appData.svincoli));
+        }
+        
+        function savePreferenze() {
+            const key = getStorageKey('preferenze');
+            if (key) localStorage.setItem(key, JSON.stringify(appData.preferenze));
+        }
+        
+        function saveNuoviArrivi() {
+            const key = getStorageKey('nuoviarrivi');
+            if (key) localStorage.setItem(key, JSON.stringify(appData.nuoviArrivi));
+        }
+        
+        function saveConfig() {
+            // Read values from inputs - use nullish coalescing to allow 0 values
+            const budgetInizialeVal = parseInt(document.getElementById('config-budget-iniziale').value);
+            appData.config.budgetIniziale = isNaN(budgetInizialeVal) ? 500 : budgetInizialeVal;
+            
+            const creditiAggVal = parseInt(document.getElementById('config-crediti-aggiuntivi').value);
+            appData.config.creditiAggiuntivi = isNaN(creditiAggVal) ? 50 : creditiAggVal;
+            
+            // Read rimborso options
+            appData.config.rimborsoPercentuale = parseInt(document.getElementById('config-rimborso-percentuale').value) || 50;
+            appData.config.rimborsoFuoriLista = parseInt(document.getElementById('config-rimborso-fuorilista').value) || 100;
+            appData.config.arrotondamento = document.getElementById('config-arrotondamento').value || 'floor';
+            
+            // Read per-squadra budgets - allow 0 and negative values
+            Object.keys(appData.squadre).forEach(sq => {
+                const input = document.getElementById(`config-budget-${sq.replace(/[^a-zA-Z0-9]/g, '_')}`);
+                if (input) {
+                    const val = parseInt(input.value);
+                    appData.config.budgetSquadre[sq] = isNaN(val) ? 0 : val;
+                }
+            });
+            
+            const keyConfig = getStorageKey('config');
+            if (keyConfig) localStorage.setItem(keyConfig, JSON.stringify(appData.config));
+            
+            // Refresh UI - ricalcola tutti i rimborsi con le nuove regole
+            renderBudgetCards();
+            renderSquadre();
+            updateTotaleLega();
+            updateRiepilogoSvincoli();
+            alert('✅ Configurazione salvata!');
+        }
+        
+        function resetConfig() {
+            if (!confirm('Sei sicuro di voler resettare la configurazione ai valori di default?')) return;
+            
+            appData.config.budgetIniziale = 500;
+            appData.config.creditiAggiuntivi = 50;
+            appData.config.rimborsoPercentuale = 50;
+            appData.config.rimborsoFuoriLista = 100;
+            appData.config.arrotondamento = 'floor';
+            
+            // Recalculate budgets
+            Object.keys(appData.squadre).forEach(sq => {
+                const costo = appData.squadre[sq].reduce((sum, cal) => sum + cal.costo, 0);
+                appData.config.budgetSquadre[sq] = appData.config.budgetIniziale - costo;
+            });
+            
+            const keyConfig = getStorageKey('config');
+            if (keyConfig) localStorage.removeItem(keyConfig);
+            
+            renderConfigPage();
+            renderBudgetCards();
+            renderSquadre();
+            updateTotaleLega();
+            updateRiepilogoSvincoli();
+            alert('🔄 Configurazione resettata!');
+        }
+        
+        function recalcBudgetSquadre() {
+            // Leggi il budget iniziale dal campo input (non da appData, per usare il valore attuale)
+            const budgetIniziale = parseInt(document.getElementById('config-budget-iniziale').value) || 500;
+            
+            // Ricalcola i budget per ogni squadra
+            Object.keys(appData.squadre).forEach(sq => {
+                const costo = appData.squadre[sq].reduce((sum, cal) => sum + cal.costo, 0);
+                appData.config.budgetSquadre[sq] = budgetIniziale - costo;
+            });
+            
+            // Aggiorna la griglia nella pagina config
+            const grid = document.getElementById('config-squadre-grid');
+            grid.innerHTML = Object.keys(appData.squadre).sort().map(sq => {
+                const safeId = sq.replace(/[^a-zA-Z0-9]/g, '_');
+                const budget = appData.config.budgetSquadre[sq] || 0;
+                return `
+                    <div class="config-item">
+                        <label>${sq}</label>
+                        <input type="number" id="config-budget-${safeId}" value="${budget}">
+                    </div>
+                `;
+            }).join('');
+            
+            alert(`✅ Budget ricalcolati con Budget Iniziale = ${budgetIniziale}`);
+        }
+        
+        function resetAllData() {
+            if (!confirm(`⚠️ Vuoi cancellare TUTTI i dati salvati per la lega "${currentLegaName}"?\n\nQuesto include:\n- Svincoli selezionati\n- Configurazione budget\n- Preferenze giocatori\n- Nuovi arrivi mercato\n- Giocatori segnati come acquistati\n\nL'operazione non può essere annullata.`)) return;
+            
+            const keyS = getStorageKey('svincoli');
+            const keyC = getStorageKey('config');
+            const keyP = getStorageKey('preferenze');
+            const keyNA = getStorageKey('nuoviarrivi');
+            const keyAcq = getStorageKey('acquistati');
+            if (keyS) localStorage.removeItem(keyS);
+            if (keyC) localStorage.removeItem(keyC);
+            if (keyP) localStorage.removeItem(keyP);
+            if (keyNA) localStorage.removeItem(keyNA);
+            if (keyAcq) localStorage.removeItem(keyAcq);
+            
+            appData.svincoli = {};
+            appData.preferenze = {};
+            appData.nuoviArrivi = {};
+            appData.acquistati = {};
+            
+            // Reset config to defaults
+            appData.config.budgetIniziale = 500;
+            appData.config.creditiAggiuntivi = 50;
+            Object.keys(appData.squadre).forEach(sq => {
+                const costo = appData.squadre[sq].reduce((sum, cal) => sum + cal.costo, 0);
+                appData.config.budgetSquadre[sq] = appData.config.budgetIniziale - costo;
+            });
+            
+            renderAll();
+            updateMercatoPreview();
+            alert('🗑️ Tutti i dati sono stati cancellati!');
+        }
+        
+        // ===== MERCATO / NUOVI ARRIVI =====
+        function setupMercatoUpload() {
+            const mercatoInput = document.getElementById('mercato-file-input');
+            if (mercatoInput) {
+                mercatoInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) processMercatoFile(file);
+                });
+            }
+        }
+        
+        async function processMercatoFile(file) {
+            const statusDiv = document.getElementById('mercato-status');
+            statusDiv.innerHTML = '<span style="color: var(--accent);">⏳ Elaborazione in corso...</span>';
+            
+            try {
+                const htmlContent = await file.text();
+                const nuoviArrivi = parseTrasferimentiHTML(htmlContent);
+                
+                if (Object.keys(nuoviArrivi).length === 0) {
+                    statusDiv.innerHTML = '<span style="color: var(--warning);">⚠️ Nessun trasferimento trovato nel file. Assicurati di aver salvato la pagina corretta.</span>';
+                    return;
+                }
+                
+                appData.nuoviArrivi = nuoviArrivi;
+                saveNuoviArrivi();
+                
+                const totalArrivi = Object.values(nuoviArrivi).reduce((sum, arr) => sum + arr.length, 0);
+                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Caricati ${totalArrivi} nuovi arrivi da ${Object.keys(nuoviArrivi).length} squadre!</span>`;
+                
+                updateMercatoPreview();
+                
+                // Re-render tables to show badges
+                renderSquadre(true);
+                renderSvincolatiTables();
+                
+            } catch (error) {
+                console.error('Error processing mercato file:', error);
+                statusDiv.innerHTML = `<span style="color: var(--danger);">❌ Errore: ${error.message}</span>`;
+            }
+        }
+        
+        function parseTrasferimentiHTML(htmlContent) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const nuoviArrivi = {};
+            
+            // La struttura HTML di fantacalcio.it è:
+            // <div class="card team-card" id="roma">
+            //   <header> ... <a class="team-name">Roma</a> ... </header>
+            //   <div class="card-content">
+            //     <div class="joined">  <-- ARRIVI
+            //       <ul class="transfers">
+            //         <li class="transfer">
+            //           <span class="name" itemprop="name">NomeGiocatore</span>
+            //         </li>
+            //       </ul>
+            //     </div>
+            //     <div class="left">  <-- PARTENZE
+            //       ...
+            //     </div>
+            //   </div>
+            // </div>
+            
+            // Trova tutte le card delle squadre
+            const teamCards = doc.querySelectorAll('.team-card');
+            
+            teamCards.forEach(card => {
+                // Trova il nome della squadra
+                const teamNameEl = card.querySelector('.team-name');
+                if (!teamNameEl) return;
+                
+                const squadraNome = teamNameEl.textContent.trim();
+                if (!squadraNome) return;
+                
+                // Trova la sezione "joined" (arrivi)
+                const joinedSection = card.querySelector('.joined');
+                if (!joinedSection) return;
+                
+                // Trova tutti i trasferimenti in arrivo
+                const transfers = joinedSection.querySelectorAll('.transfer');
+                const arrivi = [];
+                
+                transfers.forEach(transfer => {
+                    // Il nome del giocatore è nel primo span.name dentro header
+                    const headerDiv = transfer.querySelector('.header');
+                    if (headerDiv) {
+                        const nameSpan = headerDiv.querySelector('span.name[itemprop="name"]');
+                        if (nameSpan) {
+                            const nome = nameSpan.textContent.trim();
+                            if (nome && nome.length > 1) {
+                                arrivi.push(nome);
+                            }
+                        }
+                    }
+                });
+                
+                if (arrivi.length > 0) {
+                    nuoviArrivi[squadraNome] = arrivi;
+                }
+            });
+            
+            return nuoviArrivi;
+        }
+        
+        function isNuovoArrivo(nomeCalciatore, squadraSerieA) {
+            if (!squadraSerieA || !appData.nuoviArrivi) return false;
+            
+            const arriviSquadra = appData.nuoviArrivi[squadraSerieA];
+            if (!arriviSquadra) return false;
+            
+            // Normalizza il nome per il confronto
+            const nomeNorm = nomeCalciatore.toLowerCase().trim();
+            
+            return arriviSquadra.some(arrivo => {
+                const arrivoNorm = arrivo.toLowerCase().trim();
+                // Match esatto o parziale (il cognome)
+                return nomeNorm.includes(arrivoNorm) || arrivoNorm.includes(nomeNorm) ||
+                       nomeNorm.split(' ').some(part => arrivoNorm.includes(part) && part.length > 3);
+            });
+        }
+        
+        function updateMercatoPreview() {
+            const previewDiv = document.getElementById('mercato-preview');
+            if (!previewDiv) return;
+            
+            if (Object.keys(appData.nuoviArrivi).length === 0) {
+                previewDiv.innerHTML = '';
+                return;
+            }
+            
+            let html = '<div class="mercato-preview">';
+            html += '<h4>🆕 Nuovi Arrivi Caricati</h4>';
+            
+            Object.keys(appData.nuoviArrivi).sort().forEach(squadra => {
+                const arrivi = appData.nuoviArrivi[squadra];
+                if (arrivi.length > 0) {
+                    html += `<div style="margin-bottom: 10px;"><strong>${squadra}:</strong> `;
+                    html += '<div class="mercato-preview-list">';
+                    arrivi.forEach(nome => {
+                        html += `<span class="mercato-preview-item">${nome}</span>`;
+                    });
+                    html += '</div></div>';
+                }
+            });
+            
+            html += '<button class="btn btn-secondary" style="margin-top: 15px;" onclick="clearNuoviArrivi()">🗑️ Rimuovi Nuovi Arrivi</button>';
+            html += '</div>';
+            
+            previewDiv.innerHTML = html;
+        }
+        
+        function clearNuoviArrivi() {
+            if (!confirm('Vuoi rimuovere i dati sui nuovi arrivi?')) return;
+            
+            appData.nuoviArrivi = {};
+            const keyNA = getStorageKey('nuoviarrivi');
+            if (keyNA) localStorage.removeItem(keyNA);
+            
+            updateMercatoPreview();
+            renderSquadre(true);
+            renderSvincolatiTables();
+            
+            document.getElementById('mercato-status').innerHTML = '';
+        }
+
+        // ===== UI RENDERING =====
+        function showMainApp() {
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('main-app').classList.add('active');
+            document.getElementById('file-info').textContent = `📄 ${appData.fileName}`;
+            document.getElementById('lega-name-display').textContent = `• ${currentLegaName}`;
+            
+            // Update lega name in info box
+            const legaNameInline = document.getElementById('lega-name-inline');
+            if (legaNameInline) legaNameInline.textContent = currentLegaName;
+            
+            renderAll();
+        }
+        
+        function changeFile() {
+            document.getElementById('main-app').classList.remove('active');
+            document.getElementById('welcome-page').style.display = 'flex';
+            fileInput.value = '';
+        }
+        
+        function renderAll() {
+            renderConfigPage();
+            renderBudgetCards();
+            renderSquadre();
+            renderSvincolatiTables();
+            updateTotaleLega();
+            updateRiepilogoSvincoli();
+            setupQuickSearch();
+            setupMercatoUpload();
+            updateMercatoPreview();
+        }
+        
+        function renderConfigPage() {
+            document.getElementById('config-budget-iniziale').value = appData.config.budgetIniziale;
+            document.getElementById('config-crediti-aggiuntivi').value = appData.config.creditiAggiuntivi;
+            
+            // Rimborso options
+            document.getElementById('config-rimborso-percentuale').value = appData.config.rimborsoPercentuale;
+            document.getElementById('config-rimborso-fuorilista').value = appData.config.rimborsoFuoriLista;
+            document.getElementById('config-arrotondamento').value = appData.config.arrotondamento;
+            
+            const grid = document.getElementById('config-squadre-grid');
+            grid.innerHTML = Object.keys(appData.squadre).sort().map(sq => {
+                const safeId = sq.replace(/[^a-zA-Z0-9]/g, '_');
+                const budget = appData.config.budgetSquadre[sq] || 0;
+                return `
+                    <div class="config-item">
+                        <label>${sq}</label>
+                        <input type="number" id="config-budget-${safeId}" value="${budget}">
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderBudgetCards() {
+            const grid = document.getElementById('budget-grid');
+            if (!grid) return;
+            grid.innerHTML = Object.keys(appData.squadre).sort().map(sq => {
+                const budgetBase = appData.config.budgetSquadre[sq] || 0;
+                const creditiAgg = appData.config.creditiAggiuntivi;
+                const creditiRecuperati = calcCreditiRecuperatiSquadra(sq);
+                const totale = budgetBase + creditiAgg + creditiRecuperati;
+                
+                return `
+                    <div class="budget-card">
+                        <h3>${sq}</h3>
+                        <div class="budget-row">
+                            <span>Budget post asta:</span>
+                            <span>${budgetBase}</span>
+                        </div>
+                        <div class="budget-row">
+                            <span>Crediti aggiuntivi:</span>
+                            <span>+${creditiAgg}</span>
+                        </div>
+                        <div class="budget-row" style="color: var(--success)">
+                            <span>Crediti recuperati:</span>
+                            <span>+${creditiRecuperati}</span>
+                        </div>
+                        <div class="budget-row total">
+                            <span>BUDGET TOTALE:</span>
+                            <span class="value">${totale}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function calcCreditiRecuperatiSquadra(squadra) {
+            const calciatori = appData.squadre[squadra] || [];
+            return calciatori.reduce((sum, cal) => {
+                if (appData.svincoli[cal.nome]) {
+                    return sum + calcRimborso(cal.costo, cal.fuoriLista);
+                }
+                return sum;
+            }, 0);
+        }
+        
+        function calcRimborso(costo, isFuoriLista = false) {
+            if (costo === 1) return 1;
+            
+            // Determina la percentuale di rimborso
+            const percentuale = isFuoriLista 
+                ? appData.config.rimborsoFuoriLista 
+                : appData.config.rimborsoPercentuale;
+            
+            const rimborsoRaw = costo * (percentuale / 100);
+            
+            // Applica l'arrotondamento configurato
+            switch (appData.config.arrotondamento) {
+                case 'ceil':
+                    return Math.ceil(rimborsoRaw);
+                case 'round':
+                    return Math.round(rimborsoRaw);
+                case 'floor':
+                default:
+                    return Math.floor(rimborsoRaw);
+            }
+        }
+        
+        function updateTotaleLega() {
+            // Element was removed, function kept for potential future use
+            const el = document.getElementById('totale-lega');
+            if (!el) return;
+            
+            let totale = 0;
+            Object.keys(appData.squadre).forEach(sq => {
+                const budgetBase = appData.config.budgetSquadre[sq] || 0;
+                const creditiAgg = appData.config.creditiAggiuntivi;
+                const creditiRecuperati = calcCreditiRecuperatiSquadra(sq);
+                totale += budgetBase + creditiAgg + creditiRecuperati;
+            });
+            el.textContent = totale;
+        }
+        
+        // Keep track of expanded squadre
+        function getExpandedSquadre() {
+            const expanded = [];
+            document.querySelectorAll('.squadra-section').forEach(section => {
+                const header = section.querySelector('.squadra-header');
+                if (header && !header.classList.contains('collapsed')) {
+                    expanded.push(section.id);
+                }
+            });
+            return expanded;
+        }
+        
+        function restoreExpandedSquadre(expandedIds) {
+            expandedIds.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    const header = section.querySelector('.squadra-header');
+                    const content = section.querySelector('.squadra-content');
+                    if (header && content) {
+                        header.classList.remove('collapsed');
+                        content.classList.remove('collapsed');
+                    }
+                }
+            });
+        }
+        
+        function renderSquadre(preserveExpanded = false) {
+            const container = document.getElementById('squadre-container');
+            
+            // Save expanded state before re-render
+            const expandedIds = preserveExpanded ? getExpandedSquadre() : [];
+            
+            // Role order: P, D, C, A
+            const ruoloOrder = { 'P': 1, 'D': 2, 'C': 3, 'A': 4 };
+            
+            container.innerHTML = Object.keys(appData.squadre).sort().map(sq => {
+                const calciatori = [...appData.squadre[sq]].sort((a, b) => {
+                    return (ruoloOrder[a.ruolo] || 99) - (ruoloOrder[b.ruolo] || 99);
+                });
+                const numSvincolati = calciatori.filter(c => appData.svincoli[c.nome]).length;
+                const safeId = sq.replace(/[^a-zA-Z0-9]/g, '_');
+                
+                return `
+                    <div class="squadra-section" id="squadra-${safeId}">
+                        <div class="squadra-header collapsed" onclick="toggleSquadra('${safeId}')">
+                            <h3>
+                                ${sq}
+                                <span class="counter">(${numSvincolati}/${calciatori.length} svincolati)</span>
+                            </h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="squadra-content collapsed">
+                            <div class="squadra-actions">
+                                <button class="btn-reset" onclick="resetSvincoliSquadra('${sq}')">🗑️ Reset svincoli</button>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Svincola</th>
+                                        <th>Nome</th>
+                                        <th>Ruolo</th>
+                                        <th>Squadra</th>
+                                        <th>Costo</th>
+                                        <th>Rimborso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${calciatori.map(cal => {
+                                        const isSvincolato = appData.svincoli[cal.nome];
+                                        const rimborso = calcRimborso(cal.costo, cal.fuoriLista);
+                                        const rowClass = cal.fuoriLista ? 'fuori-lista' : (isSvincolato ? 'svincolato' : '');
+                                        const nuovoArrivo = isNuovoArrivo(cal.nome, cal.squadra);
+                                        return `
+                                            <tr class="${rowClass}">
+                                                <td>
+                                                    <input type="checkbox" 
+                                                        ${isSvincolato ? 'checked' : ''} 
+                                                        onchange="toggleSvincolo('${cal.nome.replace(/'/g, "\\'")}', this.checked)">
+                                                </td>
+                                                <td>${cal.nome}${cal.fuoriLista ? ' ⚠️' : ''}${nuovoArrivo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}</td>
+                                                <td>${cal.ruolo}</td>
+                                                <td>${cal.squadra}</td>
+                                                <td>${cal.costo}</td>
+                                                <td>${isSvincolato ? rimborso : '-'}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Restore expanded state after re-render
+            if (preserveExpanded) {
+                restoreExpandedSquadre(expandedIds);
+            }
+        }
+        
+        function toggleSquadra(safeId) {
+            const section = document.getElementById(`squadra-${safeId}`);
+            const header = section.querySelector('.squadra-header');
+            const content = section.querySelector('.squadra-content');
+            
+            header.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        }
+        
+        function toggleSvincolo(nome, checked) {
+            if (checked) {
+                appData.svincoli[nome] = true;
+            } else {
+                delete appData.svincoli[nome];
+            }
+            saveSvincoli();
+            rebuildSvincolati();
+            renderBudgetCards();
+            renderSquadre(true);
+            renderSvincolatiTables();
+            updateTotaleLega();
+            updateRiepilogoSvincoli();
+        }
+        
+        function resetSvincoliSquadra(squadra) {
+            if (!confirm(`Vuoi resettare tutti gli svincoli di ${squadra}?`)) return;
+            
+            const calciatori = appData.squadre[squadra] || [];
+            calciatori.forEach(cal => {
+                delete appData.svincoli[cal.nome];
+            });
+            
+            saveSvincoli();
+            rebuildSvincolati();
+            renderBudgetCards();
+            renderSquadre();
+            renderSvincolatiTables();
+            updateTotaleLega();
+            updateRiepilogoSvincoli();
+        }
+        
+        function updateRiepilogoSvincoli() {
+            const content = document.getElementById('riepilogo-content');
+            const countSpan = document.getElementById('count-svincoli');
+            
+            if (!content || !countSpan) return;
+            
+            const svincolati = [];
+            Object.keys(appData.squadre).forEach(sq => {
+                appData.squadre[sq].forEach(cal => {
+                    if (appData.svincoli[cal.nome]) {
+                        svincolati.push({
+                            nome: cal.nome,
+                            squadra: sq,
+                            costo: cal.costo,
+                            fuoriLista: cal.fuoriLista,
+                            rimborso: calcRimborso(cal.costo, cal.fuoriLista)
+                        });
+                    }
+                });
+            });
+            
+            countSpan.textContent = svincolati.length;
+            
+            if (svincolati.length === 0) {
+                content.innerHTML = '<div class="riepilogo-empty">Nessun calciatore svincolato</div>';
+            } else {
+                content.innerHTML = svincolati.map(s => `
+                    <div class="riepilogo-item">
+                        <span><strong>${s.nome}</strong> (${s.squadra})</span>
+                        <span>Costo: ${s.costo} → Rimborso: <strong style="color: var(--success)">+${s.rimborso}</strong></span>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function toggleRiepilogo() {
+            const content = document.getElementById('riepilogo-content');
+            content.classList.toggle('collapsed');
+        }
+        
+        // ===== QUICK SEARCH =====
+        function setupQuickSearch() {
+            const input = document.getElementById('quick-search');
+            const list = document.getElementById('autocomplete-list');
+            let selectedPlayer = null;
+            let selectedIsSvincolato = false;
+            
+            input.addEventListener('input', () => {
+                const query = input.value.toLowerCase().trim();
+                selectedPlayer = null;
+                selectedIsSvincolato = false;
+                
+                if (query.length < 2) {
+                    list.classList.remove('show');
+                    updateQuickButton();
+                    return;
+                }
+                
+                // Search in all squadre (both svincolati and non)
+                const matches = [];
+                Object.keys(appData.squadre).forEach(sq => {
+                    appData.squadre[sq].forEach(cal => {
+                        if (cal.nome.toLowerCase().includes(query)) {
+                            matches.push({ 
+                                ...cal, 
+                                fantaSquadra: sq,
+                                isSvincolato: !!appData.svincoli[cal.nome]
+                            });
+                        }
+                    });
+                });
+                
+                if (matches.length === 0) {
+                    list.classList.remove('show');
+                    return;
+                }
+                
+                list.innerHTML = matches.slice(0, 10).map(m => `
+                    <div class="autocomplete-item ${m.isSvincolato ? 'svincolato' : ''}" 
+                         data-nome="${m.nome.replace(/"/g, '&quot;')}"
+                         data-svincolato="${m.isSvincolato}">
+                        <div>
+                            ${m.isSvincolato ? '🔓 ' : ''}${m.nome} (${m.ruolo})
+                            ${m.isSvincolato ? '<span style="color: var(--warning); font-size: 0.8rem;"> - Svincolato</span>' : ''}
+                        </div>
+                        <div class="squadra">${m.fantaSquadra} - ${m.squadra}</div>
+                    </div>
+                `).join('');
+                
+                list.classList.add('show');
+                
+                // Handle click
+                list.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        selectedPlayer = item.dataset.nome;
+                        selectedIsSvincolato = item.dataset.svincolato === 'true';
+                        input.value = selectedPlayer;
+                        list.classList.remove('show');
+                        updateQuickButton();
+                    });
+                });
+            });
+            
+            // Store selected player for quick svincola
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && input.value) {
+                    quickSvincolaToggle();
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.quick-search-wrapper')) {
+                    list.classList.remove('show');
+                }
+            });
+            
+            // Update button based on selection
+            function updateQuickButton() {
+                const btn = document.getElementById('quick-svincola-btn');
+                if (selectedIsSvincolato) {
+                    btn.textContent = '↩️ Annulla';
+                    btn.style.background = 'var(--warning)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.textContent = '⚡ Svincola';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }
+            }
+        }
+        
+        function quickSvincolaToggle() {
+            const input = document.getElementById('quick-search');
+            const nome = input.value.trim();
+            
+            if (!nome) {
+                alert('Seleziona un calciatore dalla lista');
+                return;
+            }
+            
+            // Find the player
+            let found = false;
+            Object.keys(appData.squadre).forEach(sq => {
+                appData.squadre[sq].forEach(cal => {
+                    if (cal.nome === nome) {
+                        found = true;
+                    }
+                });
+            });
+            
+            if (!found) {
+                alert('Calciatore non trovato');
+                return;
+            }
+            
+            // Toggle svincolo
+            const isSvincolato = !!appData.svincoli[nome];
+            toggleSvincolo(nome, !isSvincolato);
+            
+            input.value = '';
+            document.getElementById('autocomplete-list').classList.remove('show');
+            
+            // Reset button
+            const btn = document.getElementById('quick-svincola-btn');
+            btn.textContent = '⚡ Svincola';
+            btn.style.background = '';
+            btn.style.color = '';
+        }
+        
+        // Legacy function for onclick
+        function quickSvincola() {
+            quickSvincolaToggle();
+        }
+        
+        // ===== SVINCOLATI TABLES =====
+        function renderSvincolatiTables() {
+            ['P', 'D', 'C', 'A'].forEach(ruolo => {
+                const tabId = RUOLI_MAP[ruolo].toLowerCase();
+                renderFilters(ruolo, tabId);
+                renderSvincolatiTable(ruolo, tabId);
+            });
+        }
+        
+        function renderFilters(ruolo, tabId) {
+            const container = document.getElementById(`filters-${tabId}`);
+            const squadreSerieA = [...new Set(appData.svincolati[ruolo].map(c => c.squadra))].sort();
+            
+            const hasNuoviArrivi = Object.keys(appData.nuoviArrivi).length > 0;
+            
+            container.innerHTML = `
+                <div class="filter-group">
+                    <label>Cerca</label>
+                    <input type="text" id="filter-search-${tabId}" placeholder="Nome calciatore..." onkeyup="filterTable('${ruolo}', '${tabId}')">
+                </div>
+                <div class="filter-group">
+                    <label>Squadra</label>
+                    <select id="filter-squadra-${tabId}" onchange="filterTable('${ruolo}', '${tabId}')">
+                        <option value="">Tutte</option>
+                        ${squadreSerieA.map(s => `<option value="${s}">${s}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>FM min</label>
+                    <input type="number" id="filter-fm-${tabId}" placeholder="0" step="0.5" onchange="filterTable('${ruolo}', '${tabId}')">
+                </div>
+                <div class="filter-group">
+                    <label>PGv min</label>
+                    <input type="number" id="filter-pgv-${tabId}" placeholder="0" onchange="filterTable('${ruolo}', '${tabId}')">
+                </div>
+                <div class="filter-group">
+                    <label>⭐ Preferiti</label>
+                    <select id="filter-preferiti-${tabId}" onchange="filterTable('${ruolo}', '${tabId}')">
+                        <option value="">Tutti</option>
+                        <option value="1">⭐ 1+ stelle</option>
+                        <option value="2">⭐⭐ 2+ stelle</option>
+                        <option value="3">⭐⭐⭐ 3+ stelle</option>
+                        <option value="4">⭐⭐⭐⭐ 4+ stelle</option>
+                        <option value="5">⭐⭐⭐⭐⭐ Solo 5 stelle</option>
+                    </select>
+                </div>
+                ${hasNuoviArrivi ? `
+                <div class="filter-group">
+                    <label>🆕 Mercato</label>
+                    <select id="filter-nuoviarrivi-${tabId}" onchange="filterTable('${ruolo}', '${tabId}')">
+                        <option value="">Tutti</option>
+                        <option value="1">Solo nuovi arrivi</option>
+                    </select>
+                </div>
+                ` : ''}
+                <div class="filter-group">
+                    <label>🔓 Rilasciati</label>
+                    <select id="filter-rilasciati-${tabId}" onchange="filterTable('${ruolo}', '${tabId}')">
+                        <option value="">Tutti</option>
+                        <option value="1">Solo rilasciati</option>
+                        <option value="0">Escludi rilasciati</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>❌ Acquistati</label>
+                    <select id="filter-acquistati-${tabId}" onchange="filterTable('${ruolo}', '${tabId}')">
+                        <option value="0">Nascondi acquistati</option>
+                        <option value="">Mostra tutti</option>
+                        <option value="1">Solo acquistati</option>
+                    </select>
+                </div>
+            `;
+        }
+        
+        function renderSvincolatiTable(ruolo, tabId, sortCol = 'pgv', sortDir = 'desc') {
+            const container = document.getElementById(`table-${tabId}`);
+            let data = [...appData.svincolati[ruolo]];
+            
+            // Apply filters
+            const search = document.getElementById(`filter-search-${tabId}`)?.value.toLowerCase() || '';
+            const squadra = document.getElementById(`filter-squadra-${tabId}`)?.value || '';
+            const fmMin = parseFloat(document.getElementById(`filter-fm-${tabId}`)?.value) || 0;
+            const pgvMin = parseFloat(document.getElementById(`filter-pgv-${tabId}`)?.value) || 0;
+            const preferitiMin = parseInt(document.getElementById(`filter-preferiti-${tabId}`)?.value) || 0;
+            const soloNuoviArrivi = document.getElementById(`filter-nuoviarrivi-${tabId}`)?.value === '1';
+            const rilasciatiFilter = document.getElementById(`filter-rilasciati-${tabId}`)?.value || '';
+            const acquistatiFilter = document.getElementById(`filter-acquistati-${tabId}`)?.value ?? '0';
+            
+            data = data.filter(c => {
+                if (search && !c.nome.toLowerCase().includes(search)) return false;
+                if (squadra && c.squadra !== squadra) return false;
+                if (c.fm < fmMin) return false;
+                if (c.pgv < pgvMin) return false;
+                if (soloNuoviArrivi && !isNuovoArrivo(c.nome, c.squadra)) return false;
+                if (rilasciatiFilter === '1' && !c.rilasciatoDa) return false;
+                if (rilasciatiFilter === '0' && c.rilasciatoDa) return false;
+                // Filtro acquistati
+                const isAcquistato = appData.acquistati[c.nome] || false;
+                if (acquistatiFilter === '0' && isAcquistato) return false;
+                if (acquistatiFilter === '1' && !isAcquistato) return false;
+                if (preferitiMin > 0) {
+                    const pref = appData.preferenze[c.nome] || 0;
+                    if (pref < preferitiMin) return false;
+                }
+                return true;
+            });
+            
+            // Sort
+            data.sort((a, b) => {
+                let valA = a[sortCol];
+                let valB = b[sortCol];
+                if (typeof valA === 'string') {
+                    valA = valA.toLowerCase();
+                    valB = valB.toLowerCase();
+                }
+                if (sortDir === 'asc') return valA > valB ? 1 : -1;
+                return valA < valB ? 1 : -1;
+            });
+            
+            const columns = [
+                { key: 'preferenza', label: '⭐' },
+                { key: 'id', label: 'Id' },
+                { key: 'nome', label: 'Nome' },
+                { key: 'squadra', label: 'Sq.' },
+                { key: 'pgv', label: 'PGv' },
+                { key: 'mv', label: 'MV' },
+                { key: 'fm', label: 'FM' },
+                { key: 'fvm', label: 'FVM/1000' },
+                { key: 'quot', label: 'QUOT.' },
+                { key: 'indiceAffidabilita', label: 'Indice Affidabilità' },
+                { key: 'azione', label: '❌' }
+            ];
+            
+            // Add preferenza to data for sorting
+            data = data.map(cal => ({
+                ...cal,
+                preferenza: appData.preferenze[cal.nome] || 0,
+                isNuovo: isNuovoArrivo(cal.nome, cal.squadra),
+                isAcquistato: appData.acquistati[cal.nome] || false
+            }));
+            
+            container.innerHTML = `
+                <p style="margin-bottom: 10px; color: var(--text-secondary)">Trovati: ${data.length} calciatori</p>
+                <table>
+                    <thead>
+                        <tr>
+                            ${columns.map(col => `
+                                <th class="${sortCol === col.key ? 'sorted' : ''}" 
+                                    onclick="sortSvincolatiTable('${ruolo}', '${tabId}', '${col.key}', '${sortCol === col.key && sortDir === 'desc' ? 'asc' : 'desc'}')">
+                                    ${col.label}
+                                    <span class="sort-icon">${sortCol === col.key ? (sortDir === 'desc' ? '▼' : '▲') : '↕'}</span>
+                                </th>
+                            `).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(cal => `
+                            <tr class="${cal.preferenza > 0 ? 'preferito' : ''}${cal.isNuovo ? ' nuovo-arrivo' : ''}${cal.rilasciatoDa ? ' rilasciato' : ''}${cal.isAcquistato ? ' acquistato' : ''}">
+                                <td class="stars-cell no-strike">
+                                    ${renderStars(cal.nome, cal.preferenza, ruolo, tabId)}
+                                </td>
+                                <td>${cal.id}</td>
+                                <td>
+                                    ${cal.nome}
+                                    ${cal.isNuovo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}
+                                    ${cal.rilasciatoDa ? `<span class="rilasciato-badge" title="Rilasciato da ${cal.rilasciatoDa}">🔓 ${cal.rilasciatoDa}</span>` : ''}
+                                    ${cal.isAcquistato ? '<span class="acquistato-badge">PRESO</span>' : ''}
+                                </td>
+                                <td>${cal.squadra}</td>
+                                <td>${cal.pgv}</td>
+                                <td>${cal.mv.toFixed(2)}</td>
+                                <td>${cal.fm.toFixed(2)}</td>
+                                <td>${cal.fvm.toFixed(2)}</td>
+                                <td>${cal.quot}</td>
+                                <td>${cal.indiceAffidabilita.toFixed(2)}</td>
+                                <td class="no-strike">
+                                    <button class="btn-acquistato ${cal.isAcquistato ? 'active' : ''}" 
+                                            onclick="toggleAcquistato('${cal.nome.replace(/'/g, "\\'")}')"
+                                            title="${cal.isAcquistato ? 'Segna come disponibile' : 'Segna come preso da altri'}">
+                                        ${cal.isAcquistato ? '✅' : '❌'}
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function renderStars(nome, current, ruolo, tabId) {
+            let html = '<div class="stars-rating">';
+            for (let i = 1; i <= 5; i++) {
+                const filled = i <= current;
+                html += `<span class="star ${filled ? 'filled' : ''}" onclick="setPreferenza('${nome.replace(/'/g, "\\'")}', ${i}, '${ruolo}', '${tabId}')">${filled ? '★' : '☆'}</span>`;
+            }
+            if (current > 0) {
+                html += `<span class="star-clear" onclick="setPreferenza('${nome.replace(/'/g, "\\'")}', 0, '${ruolo}', '${tabId}')" title="Rimuovi">✕</span>`;
+            }
+            html += '</div>';
+            return html;
+        }
+        
+        function setPreferenza(nome, value, ruolo, tabId) {
+            if (value === 0) {
+                delete appData.preferenze[nome];
+            } else {
+                appData.preferenze[nome] = value;
+            }
+            savePreferenze();
+            renderSvincolatiTable(ruolo, tabId);
+        }
+        
+        function toggleAcquistato(nome) {
+            if (appData.acquistati[nome]) {
+                delete appData.acquistati[nome];
+            } else {
+                appData.acquistati[nome] = true;
+            }
+            saveAcquistati();
+            renderSvincolatiTables();
+        }
+        
+        function saveAcquistati() {
+            const key = getStorageKey('acquistati');
+            if (key) localStorage.setItem(key, JSON.stringify(appData.acquistati));
+        }
+        
+        function filterTable(ruolo, tabId) {
+            renderSvincolatiTable(ruolo, tabId);
+        }
+        
+        function sortSvincolatiTable(ruolo, tabId, col, dir) {
+            renderSvincolatiTable(ruolo, tabId, col, dir);
+        }
+        
+        // ===== STATISTICS =====
+        // ===== TABS =====
+        function switchToTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            const tabBtn = document.querySelector(`.tab[data-tab="${tabName}"]`);
+            if (tabBtn) tabBtn.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchToTab(tab.dataset.tab);
+            });
+        });
+    </script>
+</body>
+</html>
