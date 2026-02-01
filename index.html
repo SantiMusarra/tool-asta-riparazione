@@ -196,6 +196,111 @@
             font-size: 0.9rem;
         }
         
+        .instruction-screenshot {
+            margin-top: 12px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .instruction-screenshot img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+        
+        .instruction-screenshot img:hover {
+            transform: scale(1.02);
+        }
+        
+        .mobile-note {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: rgba(100, 200, 255, 0.1);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .mobile-note-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .mobile-note-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        
+        .mobile-note-thumb {
+            width: 60px;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .mobile-note-thumb:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Lightbox Modal */
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+        
+        .lightbox-overlay.active {
+            display: flex;
+        }
+        
+        .lightbox-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            animation: lightbox-zoom 0.2s ease;
+        }
+        
+        @keyframes lightbox-zoom {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .lightbox-close:hover {
+            opacity: 1;
+        }
+        
         .file-format {
             margin-top: 20px;
             padding: 20px;
@@ -1484,6 +1589,12 @@
     </style>
 </head>
 <body>
+    <!-- Lightbox Modal -->
+    <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="Immagine ingrandita">
+    </div>
+
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
@@ -1509,11 +1620,26 @@
             <div class="instructions-box">
                 <h4>📥 Come ottenere il file della tua lega</h4>
                 <ol class="instructions-list">
-                    <li>Accedi a <a href="https://leghe.fantacalcio.it/" target="_blank">leghe.fantacalcio.it</a></li>
-                    <li>Seleziona la <strong>lega</strong> che ti interessa</li>
-                    <li>Vai nella sezione <code>Lista Svincolati</code></li>
-                    <li>Togli la spunta dalla checkbox <code>Solo svincolati</code></li>
-                    <li>Clicca su <strong>Scarica</strong> → seleziona <code>Lista completa</code></li>
+                    <li>
+                        Accedi a <a href="https://leghe.fantacalcio.it/login" target="_blank">leghe.fantacalcio.it</a> e seleziona la tua <strong>lega</strong> dal menu in alto, poi clicca su <strong>Lista Calciatori</strong>
+                        <div class="instruction-screenshot">
+                            <img src="screenshots/step1-menu-lega.png" alt="Step 1: Seleziona lega e Lista Calciatori" loading="lazy">
+                        </div>
+                        <div class="mobile-note">
+                            <span class="mobile-note-icon">📱</span>
+                            <span class="mobile-note-text">Su <strong>mobile</strong>, tocca l'icona menu (☰) in alto a destra per aprire il menu</span>
+                            <img src="screenshots/step1-menu-mobile.jpeg" alt="Menu mobile" class="mobile-note-thumb" onclick="openLightbox(this.src)">
+                        </div>
+                    </li>
+                    <li>
+                        Nella pagina Lista Calciatori, assicurati che <strong>"Solo svincolati"</strong> sia <strong>disattivato</strong>, poi clicca sul pulsante <strong>Scarica</strong> (icona in alto a destra) e seleziona <strong>"Lista completa"</strong>
+                        <div class="instruction-screenshot">
+                            <img src="screenshots/step2-scarica-lista.png" alt="Step 2: Scarica Lista Completa" loading="lazy">
+                        </div>
+                    </li>
+                    <li>
+                        Carica il file Excel scaricato qui sopra!
+                    </li>
                 </ol>
             </div>
             
@@ -1550,7 +1676,7 @@
                 <span>
                     <strong>Nome file:</strong> Per funzionare correttamente, il nome del file deve contenere il nome della lega 
                     dopo l'ultimo underscore (es: <code>lista_calciatori_..._nome-lega.xlsx</code>). 
-                    Se scarichi il file direttamente da <a href="https://leghe.fantacalcio.it/" target="_blank" style="color: var(--accent);">leghe.fantacalcio.it</a> senza rinominarlo, funzionerà automaticamente!
+                    Se scarichi il file direttamente da <a href="https://leghe.fantacalcio.it/login" target="_blank" style="color: var(--accent);">leghe.fantacalcio.it</a> senza rinominarlo, funzionerà automaticamente!
                 </span>
             </div>
             
@@ -1844,6 +1970,26 @@
     </div>
 
     <script>
+        // ===== LIGHTBOX =====
+        function openLightbox(src) {
+            const overlay = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLightbox() {
+            const overlay = document.getElementById('lightbox');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // Chiudi con ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+        
         // ===== GLOBAL STATE =====
         let appData = {
             calciatori: [],
