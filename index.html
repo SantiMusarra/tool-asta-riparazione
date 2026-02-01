@@ -2832,8 +2832,21 @@
                 return true;
             });
             
-            // Sort
+            // Add preferenza and other computed fields BEFORE sorting
+            data = data.map(cal => ({
+                ...cal,
+                preferenza: appData.preferenze[cal.nome] || 0,
+                isNuovo: isNuovoArrivo(cal.nome, cal.squadra),
+                isAcquistato: appData.acquistati[cal.nome] || false
+            }));
+            
+            // Sort - preferiti sempre in cima, poi ordina per colonna selezionata
             data.sort((a, b) => {
+                // Prima ordina per preferenza (decrescente) - i preferiti vanno in cima
+                if (a.preferenza !== b.preferenza) {
+                    return b.preferenza - a.preferenza;
+                }
+                // Poi ordina per la colonna selezionata
                 let valA = a[sortCol];
                 let valB = b[sortCol];
                 if (typeof valA === 'string') {
@@ -2857,14 +2870,6 @@
                 { key: 'indiceAffidabilita', label: 'Indice Affidabilità' },
                 { key: 'azione', label: '❌' }
             ];
-            
-            // Add preferenza to data for sorting
-            data = data.map(cal => ({
-                ...cal,
-                preferenza: appData.preferenze[cal.nome] || 0,
-                isNuovo: isNuovoArrivo(cal.nome, cal.squadra),
-                isAcquistato: appData.acquistati[cal.nome] || false
-            }));
             
             container.innerHTML = `
                 <p style="margin-bottom: 10px; color: var(--text-secondary)">Trovati: ${data.length} calciatori</p>
