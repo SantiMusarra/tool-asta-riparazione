@@ -1100,6 +1100,54 @@
             animation: pulse-badge 2s infinite;
         }
         
+        .infortunato-badge {
+            background: linear-gradient(135deg, #d63031, #e17055);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: bold;
+            cursor: help;
+            position: relative;
+        }
+        
+        .infortunato-badge::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            margin-left: 8px;
+            background: #2d3436;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: normal;
+            width: 250px;
+            white-space: normal;
+            text-align: left;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.1s, visibility 0.1s;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .infortunato-badge:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        tr.infortunato {
+            background: rgba(214, 48, 49, 0.1) !important;
+        }
+        
+        tr.infortunato:not(.acquistato) td {
+            color: #d63031;
+        }
+        
         .rilasciato-badge {
             background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             color: white;
@@ -1476,6 +1524,7 @@
                     <div class="legenda-items">
                         <span class="legenda-item">⚠️ Fuori Lista (non acquistabile)</span>
                         <span class="legenda-item"><span class="nuovo-arrivo-badge">NEW</span> Nuovo acquisto dal mercato</span>
+                        <span class="legenda-item"><span class="infortunato-badge">🏥 INF</span> Giocatore infortunato</span>
                         <span class="legenda-item">🔓 Già svincolato (ricerca rapida)</span>
                         <span class="legenda-item">⭐ Preferenza personale (1-5 stelle)</span>
                         <span class="legenda-item" style="color: var(--success)">✅ Riga verde = giocatore svincolato</span>
@@ -1579,6 +1628,39 @@
                 </div>
                 
                 <div class="config-section" style="margin-top: 30px;">
+                    <h3>🏥 Infortunati Serie A <span class="optional-badge">Opzionale</span></h3>
+                    <div class="info-box" style="margin-bottom: 15px;">
+                        <span class="info-icon">ℹ️</span>
+                        <span>
+                            <strong>A cosa serve?</strong> Caricando la lista infortunati, i giocatori infortunati 
+                            verranno evidenziati con un badge <span class="infortunato-badge" style="font-size: 0.7rem;">🏥 INF</span> 
+                            nelle tabelle. Passando sopra al badge vedrai i dettagli dell'infortunio.
+                        </span>
+                    </div>
+                    <details class="mercato-details">
+                        <summary>📥 Clicca per caricare gli infortunati</summary>
+                        <div class="mercato-instructions">
+                            <h4>Come fare:</h4>
+                            <ol>
+                                <li>Vai su <a href="https://www.fantacalcio.it/infortunati-serie-a" target="_blank" style="color: var(--accent);">fantacalcio.it/infortunati-serie-a</a></li>
+                                <li>Premi <kbd>Cmd+S</kbd> (Mac) o <kbd>Ctrl+S</kbd> (Windows)</li>
+                                <li>Salva come "Pagina web, solo HTML" (.html)</li>
+                                <li>Carica il file qui sotto</li>
+                            </ol>
+                        </div>
+                        <div class="mercato-upload-zone" id="infortunati-upload-zone">
+                            <input type="file" id="infortunati-file-input" accept=".html,.htm" style="display: none;">
+                            <div class="upload-content" onclick="document.getElementById('infortunati-file-input').click()">
+                                <span class="upload-icon">📥</span>
+                                <span>Clicca per caricare il file HTML degli infortunati</span>
+                            </div>
+                        </div>
+                        <div id="infortunati-status" style="margin-top: 10px;"></div>
+                        <div id="infortunati-preview" style="margin-top: 15px;"></div>
+                    </details>
+                </div>
+                
+                <div class="config-section" style="margin-top: 30px;">
                     <h3>🆕 Nuovi Arrivi dal Mercato <span class="optional-badge">Opzionale</span></h3>
                     <div class="info-box" style="margin-bottom: 15px;">
                         <span class="info-icon">ℹ️</span>
@@ -1670,6 +1752,7 @@
             preferenze: {}, // { nomeCalciatore: 1-5 }
             acquistati: {}, // { nomeCalciatore: true } - giocatori svincolati presi da altri
             nuoviArrivi: {}, // { squadraSerieA: [nome1, nome2, ...] }
+            infortunati: {}, // { nomeCalciatore: { descrizione: '...', dataRientro: '...' } }
             config: {
                 budgetIniziale: 500,
                 creditiAggiuntivi: 50,
@@ -1916,8 +1999,8 @@
             if (savedConfig) {
                 try {
                     const parsed = JSON.parse(savedConfig);
-                    appData.config.budgetIniziale = parsed.budgetIniziale || 500;
-                    appData.config.creditiAggiuntivi = parsed.creditiAggiuntivi || 50;
+                    appData.config.budgetIniziale = parsed.budgetIniziale ?? 500;
+                    appData.config.creditiAggiuntivi = parsed.creditiAggiuntivi ?? 50;
                     appData.config.rimborsoPercentuale = parsed.rimborsoPercentuale ?? 50;
                     appData.config.rimborsoFuoriLista = parsed.rimborsoFuoriLista ?? 100;
                     appData.config.arrotondamento = parsed.arrotondamento || 'floor';
@@ -1968,6 +2051,18 @@
                     console.log(`Caricati ${Object.keys(appData.acquistati).length} giocatori acquistati da altri`);
                 } catch (e) {
                     appData.acquistati = {};
+                }
+            }
+            
+            // Load infortunati
+            const keyInf = getStorageKey('infortunati');
+            const savedInfortunati = keyInf ? localStorage.getItem(keyInf) : null;
+            if (savedInfortunati) {
+                try {
+                    appData.infortunati = JSON.parse(savedInfortunati);
+                    console.log(`Caricati ${Object.keys(appData.infortunati).length} giocatori infortunati`);
+                } catch (e) {
+                    appData.infortunati = {};
                 }
             }
             
@@ -2079,23 +2174,26 @@
         }
         
         function resetAllData() {
-            if (!confirm(`⚠️ Vuoi cancellare TUTTI i dati salvati per la lega "${currentLegaName}"?\n\nQuesto include:\n- Svincoli selezionati\n- Configurazione budget\n- Preferenze giocatori\n- Nuovi arrivi mercato\n- Giocatori segnati come acquistati\n\nL'operazione non può essere annullata.`)) return;
+            if (!confirm(`⚠️ Vuoi cancellare TUTTI i dati salvati per la lega "${currentLegaName}"?\n\nQuesto include:\n- Svincoli selezionati\n- Configurazione budget\n- Preferenze giocatori\n- Nuovi arrivi mercato\n- Infortunati\n- Giocatori segnati come acquistati\n\nL'operazione non può essere annullata.`)) return;
             
             const keyS = getStorageKey('svincoli');
             const keyC = getStorageKey('config');
             const keyP = getStorageKey('preferenze');
             const keyNA = getStorageKey('nuoviarrivi');
             const keyAcq = getStorageKey('acquistati');
+            const keyInf = getStorageKey('infortunati');
             if (keyS) localStorage.removeItem(keyS);
             if (keyC) localStorage.removeItem(keyC);
             if (keyP) localStorage.removeItem(keyP);
             if (keyNA) localStorage.removeItem(keyNA);
             if (keyAcq) localStorage.removeItem(keyAcq);
+            if (keyInf) localStorage.removeItem(keyInf);
             
             appData.svincoli = {};
             appData.preferenze = {};
             appData.nuoviArrivi = {};
             appData.acquistati = {};
+            appData.infortunati = {};
             
             // Reset config to defaults
             appData.config.budgetIniziale = 500;
@@ -2107,7 +2205,174 @@
             
             renderAll();
             updateMercatoPreview();
+            updateInfortunatiPreview();
             alert('🗑️ Tutti i dati sono stati cancellati!');
+        }
+        
+        // ===== INFORTUNATI =====
+        function setupInfortunatiUpload() {
+            const infortunatiInput = document.getElementById('infortunati-file-input');
+            if (infortunatiInput) {
+                infortunatiInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) processInfortunatiFile(file);
+                });
+            }
+        }
+        
+        async function processInfortunatiFile(file) {
+            const statusDiv = document.getElementById('infortunati-status');
+            statusDiv.innerHTML = '<span style="color: var(--accent);">⏳ Elaborazione in corso...</span>';
+            
+            try {
+                const htmlContent = await file.text();
+                const infortunati = parseInfortunatiHTML(htmlContent);
+                
+                if (Object.keys(infortunati).length === 0) {
+                    statusDiv.innerHTML = '<span style="color: var(--warning);">⚠️ Nessun infortunato trovato nel file. Assicurati di aver salvato la pagina corretta.</span>';
+                    return;
+                }
+                
+                appData.infortunati = infortunati;
+                saveInfortunati();
+                
+                const totalInfortunati = Object.keys(infortunati).length;
+                statusDiv.innerHTML = `<span style="color: var(--success);">✅ Caricati ${totalInfortunati} giocatori infortunati!</span>`;
+                
+                updateInfortunatiPreview();
+                
+                // Re-render tables to show badges
+                renderSquadre(true);
+                renderSvincolatiTables();
+                
+            } catch (error) {
+                console.error('Error processing infortunati file:', error);
+                statusDiv.innerHTML = `<span style="color: var(--danger);">❌ Errore: ${error.message}</span>`;
+            }
+        }
+        
+        function parseInfortunatiHTML(htmlContent) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const infortunati = {};
+            
+            // Struttura HTML di fantacalcio.it/infortunati-serie-a:
+            // <div class="card team-card">
+            //   <header class="team-info">
+            //     <span class="team-name">Nome Squadra</span>
+            //   </header>
+            //   <ul class="unstyled">
+            //     <li>
+            //       <strong class="item-name">Nome Giocatore</strong>
+            //       <div class="item-description"><p>Descrizione infortunio...</p></div>
+            //     </li>
+            //   </ul>
+            // </div>
+            
+            const teamCards = doc.querySelectorAll('.team-card');
+            
+            teamCards.forEach(card => {
+                const teamNameEl = card.querySelector('.team-name');
+                if (!teamNameEl) return;
+                
+                const squadraNome = teamNameEl.textContent.trim();
+                
+                // Trova tutti i giocatori infortunati
+                const items = card.querySelectorAll('li');
+                
+                items.forEach(item => {
+                    const nameEl = item.querySelector('.item-name, strong');
+                    const descEl = item.querySelector('.item-description p, .item-description');
+                    
+                    if (nameEl) {
+                        const nome = nameEl.textContent.trim();
+                        const descrizione = descEl ? descEl.textContent.trim() : 'Infortunato';
+                        
+                        if (nome && nome.length > 1) {
+                            infortunati[nome] = {
+                                squadra: squadraNome,
+                                descrizione: descrizione
+                            };
+                        }
+                    }
+                });
+            });
+            
+            return infortunati;
+        }
+        
+        function isInfortunato(nomeCalciatore) {
+            if (!appData.infortunati || Object.keys(appData.infortunati).length === 0) return null;
+            
+            // Normalizza il nome per il confronto
+            const nomeNorm = nomeCalciatore.toLowerCase().trim();
+            
+            for (const [nomeInf, info] of Object.entries(appData.infortunati)) {
+                const nomeInfNorm = nomeInf.toLowerCase().trim();
+                // Match esatto o parziale
+                if (nomeNorm === nomeInfNorm || 
+                    nomeNorm.includes(nomeInfNorm) || 
+                    nomeInfNorm.includes(nomeNorm) ||
+                    nomeNorm.split(' ').some(part => nomeInfNorm.includes(part) && part.length > 3)) {
+                    return info;
+                }
+            }
+            return null;
+        }
+        
+        function updateInfortunatiPreview() {
+            const previewDiv = document.getElementById('infortunati-preview');
+            if (!previewDiv) return;
+            
+            if (Object.keys(appData.infortunati).length === 0) {
+                previewDiv.innerHTML = '';
+                return;
+            }
+            
+            let html = '<div class="mercato-preview">';
+            html += '<h4>🏥 Infortunati Caricati</h4>';
+            
+            // Raggruppa per squadra
+            const perSquadra = {};
+            Object.entries(appData.infortunati).forEach(([nome, info]) => {
+                const sq = info.squadra || 'Altro';
+                if (!perSquadra[sq]) perSquadra[sq] = [];
+                perSquadra[sq].push({ nome, descrizione: info.descrizione });
+            });
+            
+            Object.keys(perSquadra).sort().forEach(squadra => {
+                const giocatori = perSquadra[squadra];
+                html += `<div style="margin-bottom: 10px;"><strong>${squadra}:</strong> `;
+                html += '<div class="mercato-preview-list">';
+                giocatori.forEach(g => {
+                    html += `<span class="mercato-preview-item" title="${g.descrizione}" style="cursor: help;">🏥 ${g.nome}</span>`;
+                });
+                html += '</div></div>';
+            });
+            
+            html += '<button class="btn btn-secondary" style="margin-top: 15px;" onclick="clearInfortunati()">🗑️ Rimuovi Infortunati</button>';
+            html += '</div>';
+            
+            previewDiv.innerHTML = html;
+        }
+        
+        function clearInfortunati() {
+            if (!confirm('Vuoi rimuovere i dati sugli infortunati?')) return;
+            
+            appData.infortunati = {};
+            const keyInf = getStorageKey('infortunati');
+            if (keyInf) localStorage.removeItem(keyInf);
+            
+            updateInfortunatiPreview();
+            renderSquadre(true);
+            renderSvincolatiTables();
+            
+            document.getElementById('infortunati-status').innerHTML = '';
+        }
+        
+        function saveInfortunati() {
+            const key = getStorageKey('infortunati');
+            if (key) localStorage.setItem(key, JSON.stringify(appData.infortunati));
         }
         
         // ===== MERCATO / NUOVI ARRIVI =====
@@ -2305,7 +2570,9 @@
             updateRiepilogoSvincoli();
             setupQuickSearch();
             setupMercatoUpload();
+            setupInfortunatiUpload();
             updateMercatoPreview();
+            updateInfortunatiPreview();
         }
         
         function renderConfigPage() {
@@ -2480,16 +2747,18 @@
                                     ${calciatori.map(cal => {
                                         const isSvincolato = appData.svincoli[cal.nome];
                                         const rimborso = calcRimborso(cal.costo, cal.fuoriLista);
+                                        const infortunatoInfo = isInfortunato(cal.nome);
                                         const rowClass = cal.fuoriLista ? 'fuori-lista' : (isSvincolato ? 'svincolato' : '');
+                                        const infortunatoClass = infortunatoInfo ? ' infortunato' : '';
                                         const nuovoArrivo = isNuovoArrivo(cal.nome, cal.squadra);
                                         return `
-                                            <tr class="${rowClass}">
+                                            <tr class="${rowClass}${infortunatoClass}">
                                                 <td>
                                                     <input type="checkbox" 
                                                         ${isSvincolato ? 'checked' : ''} 
                                                         onchange="toggleSvincolo('${cal.nome.replace(/'/g, "\\'")}', this.checked)">
                                                 </td>
-                                                <td>${cal.nome}${cal.fuoriLista ? ' ⚠️' : ''}${nuovoArrivo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}</td>
+                                                <td>${cal.nome}${cal.fuoriLista ? ' ⚠️' : ''}${nuovoArrivo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}${infortunatoInfo ? `<span class="infortunato-badge" data-tooltip="${infortunatoInfo.descrizione}">🏥 INF</span>` : ''}</td>
                                                 <td>${cal.ruolo}</td>
                                                 <td>${cal.squadra}</td>
                                                 <td>${cal.costo}</td>
@@ -2796,6 +3065,16 @@
                         <option value="1">Solo acquistati</option>
                     </select>
                 </div>
+                ${Object.keys(appData.infortunati).length > 0 ? `
+                <div class="filter-group">
+                    <label>🏥 Infortunati</label>
+                    <select id="filter-infortunati-${tabId}" onchange="filterTable('${ruolo}', '${tabId}')">
+                        <option value="">Tutti</option>
+                        <option value="0">Escludi infortunati</option>
+                        <option value="1">Solo infortunati</option>
+                    </select>
+                </div>
+                ` : ''}
             `;
         }
         
@@ -2812,6 +3091,7 @@
             const soloNuoviArrivi = document.getElementById(`filter-nuoviarrivi-${tabId}`)?.value === '1';
             const rilasciatiFilter = document.getElementById(`filter-rilasciati-${tabId}`)?.value || '';
             const acquistatiFilter = document.getElementById(`filter-acquistati-${tabId}`)?.value ?? '0';
+            const infortunatiFilter = document.getElementById(`filter-infortunati-${tabId}`)?.value || '';
             
             data = data.filter(c => {
                 if (search && !c.nome.toLowerCase().includes(search)) return false;
@@ -2825,6 +3105,10 @@
                 const isAcquistato = appData.acquistati[c.nome] || false;
                 if (acquistatiFilter === '0' && isAcquistato) return false;
                 if (acquistatiFilter === '1' && !isAcquistato) return false;
+                // Filtro infortunati
+                const infortunato = isInfortunato(c.nome);
+                if (infortunatiFilter === '0' && infortunato) return false;
+                if (infortunatiFilter === '1' && !infortunato) return false;
                 if (preferitiMin > 0) {
                     const pref = appData.preferenze[c.nome] || 0;
                     if (pref < preferitiMin) return false;
@@ -2837,7 +3121,8 @@
                 ...cal,
                 preferenza: appData.preferenze[cal.nome] || 0,
                 isNuovo: isNuovoArrivo(cal.nome, cal.squadra),
-                isAcquistato: appData.acquistati[cal.nome] || false
+                isAcquistato: appData.acquistati[cal.nome] || false,
+                infortunatoInfo: isInfortunato(cal.nome)
             }));
             
             // Sort - preferiti sempre in cima, poi ordina per colonna selezionata
@@ -2887,7 +3172,7 @@
                     </thead>
                     <tbody>
                         ${data.map(cal => `
-                            <tr class="${cal.preferenza > 0 ? 'preferito' : ''}${cal.isNuovo ? ' nuovo-arrivo' : ''}${cal.rilasciatoDa ? ' rilasciato' : ''}${cal.isAcquistato ? ' acquistato' : ''}">
+                            <tr class="${cal.preferenza > 0 ? 'preferito' : ''}${cal.isNuovo ? ' nuovo-arrivo' : ''}${cal.rilasciatoDa ? ' rilasciato' : ''}${cal.isAcquistato ? ' acquistato' : ''}${cal.infortunatoInfo ? ' infortunato' : ''}">
                                 <td class="stars-cell no-strike">
                                     ${renderStars(cal.nome, cal.preferenza, ruolo, tabId)}
                                 </td>
@@ -2897,6 +3182,7 @@
                                     ${cal.isNuovo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}
                                     ${cal.rilasciatoDa ? `<span class="rilasciato-badge" title="Rilasciato da ${cal.rilasciatoDa}">🔓 ${cal.rilasciatoDa}</span>` : ''}
                                     ${cal.isAcquistato ? '<span class="acquistato-badge">PRESO</span>' : ''}
+                                    ${cal.infortunatoInfo ? `<span class="infortunato-badge" data-tooltip="${cal.infortunatoInfo.descrizione}">🏥 INF</span>` : ''}
                                 </td>
                                 <td>${cal.squadra}</td>
                                 <td>${cal.pgv}</td>
