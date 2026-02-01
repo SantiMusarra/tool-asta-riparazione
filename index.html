@@ -1069,6 +1069,74 @@
             border: 1px solid var(--border);
         }
         
+        .auto-fetch-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-auto-fetch {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-auto-fetch:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+        
+        .btn-auto-fetch:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-auto-fetch.loading {
+            pointer-events: none;
+        }
+        
+        .btn-auto-fetch .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fetch-status {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .fetch-status.success {
+            color: var(--success);
+        }
+        
+        .fetch-status.error {
+            color: var(--danger);
+        }
+        
+        .fetch-cooldown {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
         .mercato-upload-zone {
             border: 2px dashed var(--border);
             border-radius: 10px;
@@ -1637,8 +1705,16 @@
                             nelle tabelle. Passando sopra al badge vedrai i dettagli dell'infortunio.
                         </span>
                     </div>
+                    <div class="auto-fetch-section">
+                        <button class="btn-auto-fetch" id="btn-fetch-infortunati" onclick="fetchInfortunatiAuto()">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Aggiorna automaticamente</span>
+                        </button>
+                        <span class="fetch-status" id="infortunati-fetch-status"></span>
+                        <span class="fetch-cooldown" id="infortunati-cooldown"></span>
+                    </div>
                     <details class="mercato-details">
-                        <summary>📥 Clicca per caricare gli infortunati</summary>
+                        <summary>📥 Oppure carica manualmente</summary>
                         <div class="mercato-instructions">
                             <h4>Come fare:</h4>
                             <ol>
@@ -1671,8 +1747,16 @@
                             interessanti per l'asta di riparazione.
                         </span>
                     </div>
+                    <div class="auto-fetch-section">
+                        <button class="btn-auto-fetch" id="btn-fetch-trasferimenti" onclick="fetchTrasferimentiAuto()">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Aggiorna automaticamente</span>
+                        </button>
+                        <span class="fetch-status" id="trasferimenti-fetch-status"></span>
+                        <span class="fetch-cooldown" id="trasferimenti-cooldown"></span>
+                    </div>
                     <details class="mercato-details">
-                        <summary>📥 Clicca per caricare i trasferimenti</summary>
+                        <summary>📥 Oppure carica manualmente</summary>
                         <div class="mercato-instructions">
                             <h4>Come fare:</h4>
                             <ol>
@@ -1894,6 +1978,11 @@
         
         // ===== DATA PROCESSING =====
         function processData(rawData) {
+            // Reset dati specifici della lega PRIMA di caricare i nuovi
+            appData.svincoli = {};
+            appData.preferenze = {};
+            appData.acquistati = {};
+            
             appData.calciatori = rawData.map(row => ({
                 id: row['#'] || 0,
                 nome: row['Nome'] || '',
@@ -2030,9 +2119,8 @@
                 }
             }
             
-            // Load nuovi arrivi
-            const keyNA = getStorageKey('nuoviarrivi');
-            const savedNuoviArrivi = keyNA ? localStorage.getItem(keyNA) : null;
+            // Load nuovi arrivi (GLOBALE - non dipende dalla lega)
+            const savedNuoviArrivi = localStorage.getItem('asta_riparazione_global_nuoviarrivi');
             if (savedNuoviArrivi) {
                 try {
                     appData.nuoviArrivi = JSON.parse(savedNuoviArrivi);
@@ -2054,9 +2142,8 @@
                 }
             }
             
-            // Load infortunati
-            const keyInf = getStorageKey('infortunati');
-            const savedInfortunati = keyInf ? localStorage.getItem(keyInf) : null;
+            // Load infortunati (GLOBALE - non dipende dalla lega)
+            const savedInfortunati = localStorage.getItem('asta_riparazione_global_infortunati');
             if (savedInfortunati) {
                 try {
                     appData.infortunati = JSON.parse(savedInfortunati);
@@ -2084,8 +2171,9 @@
         }
         
         function saveNuoviArrivi() {
-            const key = getStorageKey('nuoviarrivi');
-            if (key) localStorage.setItem(key, JSON.stringify(appData.nuoviArrivi));
+            // Chiave globale - i trasferimenti sono uguali per tutte le leghe
+            const key = 'asta_riparazione_global_nuoviarrivi';
+            localStorage.setItem(key, JSON.stringify(appData.nuoviArrivi));
         }
         
         function saveConfig() {
@@ -2174,26 +2262,22 @@
         }
         
         function resetAllData() {
-            if (!confirm(`⚠️ Vuoi cancellare TUTTI i dati salvati per la lega "${currentLegaName}"?\n\nQuesto include:\n- Svincoli selezionati\n- Configurazione budget\n- Preferenze giocatori\n- Nuovi arrivi mercato\n- Infortunati\n- Giocatori segnati come acquistati\n\nL'operazione non può essere annullata.`)) return;
+            if (!confirm(`⚠️ Vuoi cancellare i dati salvati per la lega "${currentLegaName}"?\n\nQuesto include:\n- Svincoli selezionati\n- Configurazione budget\n- Preferenze giocatori\n- Giocatori segnati come acquistati\n\n⚠️ Infortunati e trasferimenti NON verranno cancellati (sono dati globali).\n\nL'operazione non può essere annullata.`)) return;
             
             const keyS = getStorageKey('svincoli');
             const keyC = getStorageKey('config');
             const keyP = getStorageKey('preferenze');
-            const keyNA = getStorageKey('nuoviarrivi');
             const keyAcq = getStorageKey('acquistati');
-            const keyInf = getStorageKey('infortunati');
             if (keyS) localStorage.removeItem(keyS);
             if (keyC) localStorage.removeItem(keyC);
             if (keyP) localStorage.removeItem(keyP);
-            if (keyNA) localStorage.removeItem(keyNA);
             if (keyAcq) localStorage.removeItem(keyAcq);
-            if (keyInf) localStorage.removeItem(keyInf);
+            // NON rimuovere nuoviarrivi e infortunati - sono globali
             
             appData.svincoli = {};
             appData.preferenze = {};
-            appData.nuoviArrivi = {};
             appData.acquistati = {};
-            appData.infortunati = {};
+            // NON resettare nuoviArrivi e infortunati - sono globali
             
             // Reset config to defaults
             appData.config.budgetIniziale = 500;
@@ -2206,7 +2290,7 @@
             renderAll();
             updateMercatoPreview();
             updateInfortunatiPreview();
-            alert('🗑️ Tutti i dati sono stati cancellati!');
+            alert('🗑️ Dati della lega cancellati! (Infortunati e trasferimenti sono globali e non vengono cancellati)');
         }
         
         // ===== INFORTUNATI =====
@@ -2357,11 +2441,10 @@
         }
         
         function clearInfortunati() {
-            if (!confirm('Vuoi rimuovere i dati sugli infortunati?')) return;
+            if (!confirm('Vuoi rimuovere i dati sugli infortunati? (Questo vale per tutte le leghe)')) return;
             
             appData.infortunati = {};
-            const keyInf = getStorageKey('infortunati');
-            if (keyInf) localStorage.removeItem(keyInf);
+            localStorage.removeItem('asta_riparazione_global_infortunati');
             
             updateInfortunatiPreview();
             renderSquadre(true);
@@ -2371,10 +2454,203 @@
         }
         
         function saveInfortunati() {
-            const key = getStorageKey('infortunati');
-            if (key) localStorage.setItem(key, JSON.stringify(appData.infortunati));
+            // Chiave globale - gli infortunati sono uguali per tutte le leghe
+            const key = 'asta_riparazione_global_infortunati';
+            localStorage.setItem(key, JSON.stringify(appData.infortunati));
         }
         
+        // ===== AUTO FETCH VIA PROXY =====
+        const PROXY_URL = 'https://api.codetabs.com/v1/proxy/?quest=';
+        const FETCH_COOLDOWN_MS = 10 * 60 * 1000; // 10 minuti
+        
+        function getLastFetchTime(type) {
+            const key = `asta_riparazione_lastfetch_${type}`;
+            const val = localStorage.getItem(key);
+            return val ? parseInt(val) : 0;
+        }
+        
+        function setLastFetchTime(type) {
+            const key = `asta_riparazione_lastfetch_${type}`;
+            localStorage.setItem(key, Date.now().toString());
+        }
+        
+        function canFetch(type) {
+            const lastFetch = getLastFetchTime(type);
+            const now = Date.now();
+            return (now - lastFetch) >= FETCH_COOLDOWN_MS;
+        }
+        
+        function getRemainingCooldown(type) {
+            const lastFetch = getLastFetchTime(type);
+            const now = Date.now();
+            const elapsed = now - lastFetch;
+            const remaining = FETCH_COOLDOWN_MS - elapsed;
+            if (remaining <= 0) return null;
+            const minutes = Math.ceil(remaining / 60000);
+            return `Disponibile tra ${minutes} min`;
+        }
+        
+        function updateCooldownDisplay(type) {
+            const cooldownEl = document.getElementById(`${type}-cooldown`);
+            const btnEl = document.getElementById(`btn-fetch-${type}`);
+            if (!cooldownEl || !btnEl) return;
+            
+            const remaining = getRemainingCooldown(type);
+            if (remaining) {
+                cooldownEl.textContent = remaining;
+                btnEl.disabled = true;
+            } else {
+                cooldownEl.textContent = '';
+                btnEl.disabled = false;
+            }
+        }
+        
+        function setFetchLoading(type, loading) {
+            const btnEl = document.getElementById(`btn-fetch-${type}`);
+            if (!btnEl) return;
+            
+            const iconEl = btnEl.querySelector('.btn-icon');
+            const textEl = btnEl.querySelector('.btn-text');
+            
+            if (loading) {
+                btnEl.classList.add('loading');
+                btnEl.disabled = true;
+                iconEl.innerHTML = '<div class="spinner"></div>';
+                textEl.textContent = 'Caricamento...';
+            } else {
+                btnEl.classList.remove('loading');
+                iconEl.textContent = '🔄';
+                textEl.textContent = 'Aggiorna automaticamente';
+                updateCooldownDisplay(type);
+            }
+        }
+        
+        function setFetchStatus(type, message, isError = false) {
+            const statusEl = document.getElementById(`${type}-fetch-status`);
+            if (!statusEl) return;
+            
+            statusEl.textContent = message;
+            statusEl.className = 'fetch-status ' + (isError ? 'error' : 'success');
+            
+            // Rimuovi il messaggio dopo 5 secondi
+            setTimeout(() => {
+                statusEl.textContent = '';
+                statusEl.className = 'fetch-status';
+            }, 5000);
+        }
+        
+        async function fetchInfortunatiAuto() {
+            if (!canFetch('infortunati')) {
+                setFetchStatus('infortunati', getRemainingCooldown('infortunati'), true);
+                return;
+            }
+            
+            setFetchLoading('infortunati', true);
+            
+            try {
+                const url = PROXY_URL + encodeURIComponent('https://www.fantacalcio.it/infortunati-serie-a');
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const html = await response.text();
+                
+                // Verifica che sia una pagina valida
+                if (!html.includes('team-card')) {
+                    throw new Error('Contenuto non valido');
+                }
+                
+                // Parsa e salva
+                const infortunati = parseInfortunatiHTML(html);
+                const count = Object.keys(infortunati).length;
+                
+                if (count === 0) {
+                    throw new Error('Nessun infortunato trovato');
+                }
+                
+                appData.infortunati = infortunati;
+                saveInfortunati();
+                setLastFetchTime('infortunati');
+                
+                // Aggiorna UI
+                updateInfortunatiPreview();
+                renderSquadre(true);
+                renderSvincolatiTables();
+                
+                setFetchStatus('infortunati', `✅ Caricati ${count} infortunati`);
+                
+            } catch (error) {
+                console.error('Fetch infortunati error:', error);
+                setFetchStatus('infortunati', '❌ Errore, usa caricamento manuale', true);
+            } finally {
+                setFetchLoading('infortunati', false);
+            }
+        }
+        
+        async function fetchTrasferimentiAuto() {
+            if (!canFetch('trasferimenti')) {
+                setFetchStatus('trasferimenti', getRemainingCooldown('trasferimenti'), true);
+                return;
+            }
+            
+            setFetchLoading('trasferimenti', true);
+            
+            try {
+                const url = PROXY_URL + encodeURIComponent('https://www.fantacalcio.it/calciomercato/trasferimenti-ufficiali');
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const html = await response.text();
+                
+                // Verifica che sia una pagina valida (cerca classi tipiche)
+                if (!html.includes('player-info') && !html.includes('transfer')) {
+                    throw new Error('Contenuto non valido');
+                }
+                
+                // Parsa e salva
+                const nuoviArrivi = parseTrasferimentiHTML(html);
+                const squadreCount = Object.keys(nuoviArrivi).length;
+                const playerCount = Object.values(nuoviArrivi).flat().length;
+                
+                if (playerCount === 0) {
+                    throw new Error('Nessun trasferimento trovato');
+                }
+                
+                appData.nuoviArrivi = nuoviArrivi;
+                saveNuoviArrivi();
+                setLastFetchTime('trasferimenti');
+                
+                // Aggiorna UI
+                updateMercatoPreview();
+                renderSquadre(true);
+                renderSvincolatiTables();
+                
+                setFetchStatus('trasferimenti', `✅ Caricati ${playerCount} trasferimenti in ${squadreCount} squadre`);
+                
+            } catch (error) {
+                console.error('Fetch trasferimenti error:', error);
+                setFetchStatus('trasferimenti', '❌ Errore, usa caricamento manuale', true);
+            } finally {
+                setFetchLoading('trasferimenti', false);
+            }
+        }
+        
+        function initAutoFetchUI() {
+            updateCooldownDisplay('infortunati');
+            updateCooldownDisplay('trasferimenti');
+            
+            // Aggiorna cooldown ogni minuto
+            setInterval(() => {
+                updateCooldownDisplay('infortunati');
+                updateCooldownDisplay('trasferimenti');
+            }, 60000);
+        }
+
         // ===== MERCATO / NUOVI ARRIVI =====
         function setupMercatoUpload() {
             const mercatoInput = document.getElementById('mercato-file-input');
@@ -2528,11 +2804,10 @@
         }
         
         function clearNuoviArrivi() {
-            if (!confirm('Vuoi rimuovere i dati sui nuovi arrivi?')) return;
+            if (!confirm('Vuoi rimuovere i dati sui nuovi arrivi? (Questo vale per tutte le leghe)')) return;
             
             appData.nuoviArrivi = {};
-            const keyNA = getStorageKey('nuoviarrivi');
-            if (keyNA) localStorage.removeItem(keyNA);
+            localStorage.removeItem('asta_riparazione_global_nuoviarrivi');
             
             updateMercatoPreview();
             renderSquadre(true);
@@ -2573,6 +2848,7 @@
             setupInfortunatiUpload();
             updateMercatoPreview();
             updateInfortunatiPreview();
+            initAutoFetchUI();
         }
         
         function renderConfigPage() {
