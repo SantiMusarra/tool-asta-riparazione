@@ -359,6 +359,17 @@
             border-color: var(--accent);
         }
         
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border: 1px solid var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+        
         /* Tabs */
         .tabs {
             display: flex;
@@ -1710,6 +1721,9 @@
                             <span class="btn-icon">🔄</span>
                             <span class="btn-text">Aggiorna automaticamente</span>
                         </button>
+                        <button class="btn btn-danger" id="btn-reset-infortunati" onclick="clearInfortunati()" style="display: none;">
+                            🗑️ Reset infortunati
+                        </button>
                         <span class="fetch-status" id="infortunati-fetch-status"></span>
                         <span class="fetch-cooldown" id="infortunati-cooldown"></span>
                     </div>
@@ -1751,6 +1765,9 @@
                         <button class="btn-auto-fetch" id="btn-fetch-trasferimenti" onclick="fetchTrasferimentiAuto()">
                             <span class="btn-icon">🔄</span>
                             <span class="btn-text">Aggiorna automaticamente</span>
+                        </button>
+                        <button class="btn btn-danger" id="btn-reset-trasferimenti" onclick="clearNuoviArrivi()" style="display: none;">
+                            🗑️ Reset trasferimenti
                         </button>
                         <span class="fetch-status" id="trasferimenti-fetch-status"></span>
                         <span class="fetch-cooldown" id="trasferimenti-cooldown"></span>
@@ -2393,11 +2410,24 @@
             
             for (const [nomeInf, info] of Object.entries(appData.infortunati)) {
                 const nomeInfNorm = nomeInf.toLowerCase().trim();
-                // Match esatto o parziale
-                if (nomeNorm === nomeInfNorm || 
-                    nomeNorm.includes(nomeInfNorm) || 
-                    nomeInfNorm.includes(nomeNorm) ||
-                    nomeNorm.split(' ').some(part => nomeInfNorm.includes(part) && part.length > 3)) {
+                
+                // Match ESATTO (case insensitive)
+                if (nomeNorm === nomeInfNorm) {
+                    return info;
+                }
+                
+                // Match per cognome esatto (il nome nel file Excel potrebbe essere solo il cognome)
+                // Es: "Vlahovic" nel file Excel vs "Dusan Vlahovic" negli infortunati
+                const partsNome = nomeNorm.split(' ');
+                const partsInf = nomeInfNorm.split(' ');
+                
+                // Se il nome nel file è una sola parola (cognome), cerca match esatto con una delle parti dell'infortunato
+                if (partsNome.length === 1 && partsInf.some(part => part === nomeNorm)) {
+                    return info;
+                }
+                
+                // Se l'infortunato ha una sola parola (cognome), cerca match esatto con una delle parti del nome file
+                if (partsInf.length === 1 && partsNome.some(part => part === nomeInfNorm)) {
                     return info;
                 }
             }
@@ -2406,15 +2436,23 @@
         
         function updateInfortunatiPreview() {
             const previewDiv = document.getElementById('infortunati-preview');
+            const resetBtn = document.getElementById('btn-reset-infortunati');
             if (!previewDiv) return;
             
-            if (Object.keys(appData.infortunati).length === 0) {
+            const hasInfortunati = Object.keys(appData.infortunati).length > 0;
+            
+            // Mostra/nascondi pulsante reset
+            if (resetBtn) {
+                resetBtn.style.display = hasInfortunati ? 'inline-block' : 'none';
+            }
+            
+            if (!hasInfortunati) {
                 previewDiv.innerHTML = '';
                 return;
             }
             
             let html = '<div class="mercato-preview">';
-            html += '<h4>🏥 Infortunati Caricati</h4>';
+            html += '<h4>🏥 Infortunati Caricati (' + Object.keys(appData.infortunati).length + ')</h4>';
             
             // Raggruppa per squadra
             const perSquadra = {};
@@ -2434,7 +2472,6 @@
                 html += '</div></div>';
             });
             
-            html += '<button class="btn btn-secondary" style="margin-top: 15px;" onclick="clearInfortunati()">🗑️ Rimuovi Infortunati</button>';
             html += '</div>';
             
             previewDiv.innerHTML = html;
@@ -2775,15 +2812,24 @@
         
         function updateMercatoPreview() {
             const previewDiv = document.getElementById('mercato-preview');
+            const resetBtn = document.getElementById('btn-reset-trasferimenti');
             if (!previewDiv) return;
             
-            if (Object.keys(appData.nuoviArrivi).length === 0) {
+            const hasNuoviArrivi = Object.keys(appData.nuoviArrivi).length > 0;
+            const totalePlayers = Object.values(appData.nuoviArrivi).flat().length;
+            
+            // Mostra/nascondi pulsante reset
+            if (resetBtn) {
+                resetBtn.style.display = hasNuoviArrivi ? 'inline-block' : 'none';
+            }
+            
+            if (!hasNuoviArrivi) {
                 previewDiv.innerHTML = '';
                 return;
             }
             
             let html = '<div class="mercato-preview">';
-            html += '<h4>🆕 Nuovi Arrivi Caricati</h4>';
+            html += '<h4>🆕 Nuovi Arrivi Caricati (' + totalePlayers + ')</h4>';
             
             Object.keys(appData.nuoviArrivi).sort().forEach(squadra => {
                 const arrivi = appData.nuoviArrivi[squadra];
@@ -2797,7 +2843,6 @@
                 }
             });
             
-            html += '<button class="btn btn-secondary" style="margin-top: 15px;" onclick="clearNuoviArrivi()">🗑️ Rimuovi Nuovi Arrivi</button>';
             html += '</div>';
             
             previewDiv.innerHTML = html;
