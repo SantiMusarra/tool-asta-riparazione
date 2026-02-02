@@ -7,6 +7,11 @@ Tool gratuito per preparare l'asta di riparazione del Fantacalcio. **100% browse
 - Vedi le rose e i budget di tutte le squadre della lega
 - Segna gli svincoli e calcola i rimborsi automaticamente
 - Esplora gli svincolati per ruolo con statistiche e quotazioni
+- **🆕 Visualizza PGv (Presenze con voto) e Media Voto** per ogni giocatore
+- **🆕 Riepilogo ruoli** nelle intestazioni squadra (P/D/C/A svincolati)
+- **🆕 Link diretti ai profili** fantacalcio.it per approfondimenti
+- **🆕 Analisi titolarità on-demand** con trend intelligente e storico giornate
+- **🆕 Distinzione subentranti** con/senza voto per massima utilità fanta
 - Segna i tuoi preferiti e tieni traccia di chi è già stato preso
 - Visualizza infortunati e nuovi arrivi dal mercato
 
@@ -79,10 +84,27 @@ fanta-rescue/
 |-----|-----------|
 | **🏠 Home** | Budget squadre, gestione svincoli, ricerca rapida, riepilogo |
 | **⚙️ Configurazione** | Impostazioni lega, regole rimborso, infortunati, trasferimenti |
-| **🧤 Portieri** | Portieri svincolati con filtri |
-| **🛡️ Difensori** | Difensori svincolati con filtri |
-| **⚽ Centrocampisti** | Centrocampisti svincolati con filtri |
-| **🎯 Attaccanti** | Attaccanti svincolati con filtri |
+| **🧤 Portieri** | Portieri svincolati con filtri e statistiche complete |
+| **🛡️ Difensori** | Difensori svincolati con filtri e statistiche complete |
+| **⚽ Centrocampisti** | Centrocampisti svincolati con filtri e statistiche complete |
+| **🎯 Attaccanti** | Attaccanti svincolati con filtri e statistiche complete |
+
+### Colonne tabelle giocatori
+
+| Colonna | Descrizione |
+|---------|-------------|
+| **Nome** | Nome giocatore con link a fantacalcio.it |
+| **Squadra** | Squadra Serie A di appartenenza |
+| **FantaSquadra** | Squadra fantacalcio proprietaria (se presente) |
+| **Q** | Quotazione attuale |
+| **PG** | Partite giocate |
+| **PGv** | **Presenze con voto** (più affidabile di PG) |
+| **MV** | **Media Voto** (calcolata solo su presenze effettive) |
+| **FM** | FantaMedia |
+| **Gol** | Gol segnati |
+| **Ass** | Assist forniti |
+| **📊** | Analisi titolarità (click per dettagli approfonditi) |
+| **⭐** | Preferenza personale (1-5 stelle) |
 
 ### Simboli e badge
 
@@ -95,6 +117,51 @@ fanta-rescue/
 | 🔓 | Già svincolato (nella ricerca rapida) |
 | PRESO | Acquistato da un'altra squadra |
 | ✅ Riga verde | Giocatore svincolato |
+| 📊 | Analisi titolarità (click per dettagli) |
+| 🔗 | Link al profilo fantacalcio.it |
+| **P/D/C/A** | Badge conteggio svincoli per ruolo |
+
+---
+
+## 📊 Analisi Titolarità
+
+### Funzionalità avanzata
+Clicca sull'icona **📊** accanto al nome del giocatore per visualizzare:
+
+#### Statistiche principali
+- **% Titolarità** - Percentuale di giornate disputate come titolare
+- **% Con Voto** - Percentuale di giornate con voto (titolare + sub con voto)
+- **Presenze** - Dettaglio titolare/subentrante/panchina/infortunato
+
+#### Analisi Trend Intelligente
+Il sistema analizza le ultime 5 giornate considerando:
+- **Confronto periodi** - Ultime 5 vs precedenti 5 giornate
+- **Sequenze consecutive** - Serie di titolarità o panchine
+- **Ultima giornata** - Performance più recente
+- **Rientro infortuni** - Impatto del ritorno in campo
+- **Pattern progressivo** - Trend crescente o decrescente
+
+**Risultato trend:**
+- 🚀 **In forte crescita** - Giocatore in ascesa
+- 📈 **Tendenza positiva** - Miglioramento graduale
+- ➡️ **Situazione stabile** - Nessun cambiamento significativo
+- 📉 **Tendenza negativa** - Peggioramento graduale
+- ⚠️ **In forte calo** - Giocatore in discesa
+
+#### Distinzione Subentranti
+Il sistema distingue tra:
+- 🟡 **Subentrante con voto** - Utile per il fantacalcio
+- 🟠 **Subentrante senza voto** - Presenza inutile per il fanta
+
+#### Visualizzazione Storico
+- **Strip giornate** - Panoramica visuale di tutte le giornate disputate
+- **Colori intuitivi** - Verde=titolare, Giallo=sub, Grigio=panchina, Viola=infortunato
+- **Barre di progresso** - Visualizzazione proporzionale delle presenze
+- **Hover tooltip** - Dettagli su ogni singola giornata
+
+> 💡 I dati vengono caricati automaticamente da fantacalcio.it tramite proxy e memorizzati in cache per velocità.
+
+> ⏱️ **Rate limiting:** 2 secondi tra richieste per evitare sovraccarichi. I dati vengono salvati in cache.
 
 ---
 
@@ -172,20 +239,22 @@ Quando svincoli un giocatore, questo torna disponibile nelle tabelle degli svinc
 ## 🔍 Filtri Disponibili
 
 Ogni tab dei ruoli include:
-- 🔎 Ricerca per nome
-- 🏟️ Filtro per squadra Serie A
-- 📈 FM minima
-- ⚽ PGv minimo
-- ⭐ Filtro preferiti (1-5 stelle)
-- 🆕 Solo nuovi arrivi
-- 🔄 Filtro rilasciati
-- ❌ Filtro acquistati
-- 🏥 Filtro infortunati
-- ✖ Pulisci filtri (reset ai valori default)
+- 🔎 **Ricerca per nome** - Trova rapidamente un giocatore
+- 🏟️ **Filtro per squadra Serie A** - Concentrati su una squadra
+- 📈 **FM minima** - Filtra per FantaMedia
+- ⚽ **PGv minimo** - Filtra per Presenze con Voto (più affidabile!)
+- ⭐ **Filtro preferiti** - Mostra solo giocatori con stelle (1-5)
+- 🆕 **Solo nuovi arrivi** - Solo acquisti recenti dal mercato
+- 🔄 **Filtro rilasciati** - Solo giocatori svincolati da squadre fanta
+- ❌ **Filtro acquistati** - Nascondi giocatori già presi
+- 🏥 **Filtro infortunati** - Nascondi/mostra solo infortunati
+- ✖ **Pulisci filtri** - Reset ai valori default
 
 Le tabelle sono **ordinabili** cliccando sulle intestazioni. L'ordinamento viene mantenuto anche quando si assegnano le stelle.
 
 > 💡 I giocatori con stelle (preferiti) appaiono sempre in cima alla tabella!
+
+> 💡 **PGv (Presenze con voto)** è più affidabile di PG perché conta solo le presenze effettive con valutazione!
 
 ---
 
@@ -249,8 +318,30 @@ Premia i calciatori che:
 5. 🏥 Carica infortunati e trasferimenti (opzionale, con auto-fetch)
 6. 🔄 Gestisci gli svincoli
 7. ⭐ Segna i tuoi preferiti
-8. 📋 Consulta gli svincolati disponibili
-9. 🔁 Ripeti quando i dati cambiano (le selezioni persistono!)
+8. � **Analizza la titolarità** dei giocatori che ti interessano
+9. 📋 Consulta gli svincolati disponibili (usa **PGv** e **MV** per valutare l'affidabilità)
+10. 🔁 Ripeti quando i dati cambiano (le selezioni persistono!)
+
+---
+
+## 🆕 Novità Versione Attuale
+
+### Statistiche Avanzate
+- ✅ **PGv (Presenze con voto)** - Più affidabile delle semplici partite giocate
+- ✅ **MV (Media Voto)** - Media calcolata solo su presenze effettive
+- ✅ **Badge ruoli** nelle intestazioni squadra per visione immediata degli svincoli
+
+### Analisi Titolarità
+- ✅ **Trend intelligente multi-fattore** - Analisi sofisticata delle ultime giornate
+- ✅ **Distinzione subentranti** con/senza voto per utilità fanta
+- ✅ **Storico completo** con visualizzazione a colori delle giornate
+- ✅ **UI moderna** con barre di progresso e indicatori visivi
+- ✅ **Cache locale** per prestazioni ottimali
+
+### Link e Navigazione
+- ✅ **Link diretti** ai profili fantacalcio.it per ogni giocatore
+- ✅ **Hover effects** per migliore interattività
+- ✅ **Responsive design** migliorato
 
 ---
 

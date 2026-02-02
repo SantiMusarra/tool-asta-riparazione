@@ -1,3 +1,23 @@
+<!--!
+ * Fanta Rescue
+ *
+ * Copyright (C) 2026 Musarra Santi
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -916,6 +936,40 @@
             font-weight: normal;
         }
         
+        .svincoli-summary {
+            display: inline-flex;
+            gap: 6px;
+            margin-left: 10px;
+        }
+        
+        .ruolo-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .ruolo-badge.P {
+            background-color: #f5a623;
+        }
+        
+        .ruolo-badge.D {
+            background-color: #4caf50;
+        }
+        
+        .ruolo-badge.C {
+            background-color: #2196f3;
+        }
+        
+        .ruolo-badge.A {
+            background-color: #f44336;
+        }
+        
         .squadra-header .toggle-icon {
             transition: transform 0.3s;
             color: var(--accent);
@@ -1055,6 +1109,377 @@
         .star-clear:hover {
             opacity: 1;
         }
+        
+        /* Player info link */
+        .player-info-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            width: 20px;
+            height: 20px;
+            font-size: 1rem;
+            color: var(--accent);
+            text-decoration: none !important;
+            opacity: 0.6;
+            transition: opacity 0.2s, transform 0.2s;
+            line-height: 1;
+        }
+        
+        .player-info-link:hover {
+            opacity: 1;
+            transform: scale(1.15);
+            text-decoration: none !important;
+        }
+        
+        /* Player titolarità button */
+        .player-titolarita-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-left: 10px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            background: transparent;
+            border: 1px solid var(--info);
+            border-radius: 12px;
+            color: var(--info);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.2s;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        
+        .player-titolarita-btn:hover {
+            opacity: 1;
+            background: var(--info);
+            color: #fff;
+        }
+        
+        .player-titolarita-btn.loading {
+            opacity: 0.5;
+            cursor: wait;
+            animation: pulse-btn 1s infinite;
+        }
+        
+        @keyframes pulse-btn {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Titolarità Popup */
+        .titolarita-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 320px;
+            max-width: 450px;
+            z-index: 10000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .titolarita-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+        }
+        
+        .titolarita-popup h3 {
+            margin: 0 0 15px 0;
+            color: var(--gold);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .titolarita-popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+        
+        .titolarita-popup .close-btn:hover {
+            color: var(--text);
+        }
+        
+        .titolarita-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .titolarita-stat {
+            background: linear-gradient(135deg, var(--bg-main) 0%, rgba(46, 107, 230, 0.1) 100%);
+            padding: 15px 12px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .titolarita-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+        }
+        
+        .titolarita-stat.titolare::before { background: var(--success); }
+        .titolarita-stat.subentrante::before { background: var(--warning); }
+        .titolarita-stat.info::before { background: var(--info); }
+        .titolarita-stat.mixed::before { background: linear-gradient(90deg, var(--success) 0%, var(--warning) 100%); }
+        
+        .titolarita-stat .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+            line-height: 1;
+        }
+        
+        .titolarita-stat .label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .titolarita-stat.titolare .value { color: var(--success); }
+        .titolarita-stat.subentrante .value { color: var(--warning); }
+        .titolarita-stat.info .value { color: var(--info); }
+        .titolarita-stat.panchina .value { color: var(--danger); }
+        
+        .titolarita-trend {
+            background: var(--bg-main);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+        }
+        
+        .titolarita-trend.positive {
+            border-color: var(--success);
+            background: linear-gradient(135deg, var(--bg-main) 0%, rgba(76, 175, 80, 0.1) 100%);
+        }
+        
+        .titolarita-trend.negative {
+            border-color: var(--danger);
+            background: linear-gradient(135deg, var(--bg-main) 0%, rgba(239, 83, 80, 0.1) 100%);
+        }
+        
+        .titolarita-trend h4 {
+            margin: 0 0 12px 0;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .trend-indicator.positive { 
+            color: var(--success);
+            background: rgba(76, 175, 80, 0.15);
+        }
+        .trend-indicator.negative { 
+            color: var(--danger);
+            background: rgba(239, 83, 80, 0.15);
+        }
+        .trend-indicator.stable { 
+            color: var(--text-secondary);
+        }
+        
+        .trend-icon {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 4px currentColor);
+        }
+        
+        .trend-reasons {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .trend-reasons div {
+            padding: 2px 0;
+        }
+        
+        .recent-games {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+        
+        .recent-games-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .recent-games-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+        
+        .recent-games-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-left: 10px;
+        }
+        
+        .titolarita-detail {
+            background: var(--bg-main);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 0;
+        }
+        
+        .titolarita-detail-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .stats-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-bar-item {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 10px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .stat-bar-item.titolare { border-left-color: var(--success); }
+        .stat-bar-item.subentrante { border-left-color: var(--warning); }
+        .stat-bar-item.subentrante-sv { border-left-color: var(--danger); }
+        .stat-bar-item.panchina { border-left-color: #666; }
+        .stat-bar-item.infortunato { border-left-color: #9c27b0; }
+        
+        .stat-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .stat-bar-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        .stat-bar-value {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        .stat-bar-progress {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .stat-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .stat-bar-item.titolare .stat-bar-fill { background: var(--success); }
+        .stat-bar-item.subentrante .stat-bar-fill { background: var(--warning); }
+        .stat-bar-item.subentrante-sv .stat-bar-fill { background: var(--danger); }
+        .stat-bar-item.panchina .stat-bar-fill { background: #666; }
+        .stat-bar-item.infortunato .stat-bar-fill { background: #9c27b0; }
+        
+        .giornate-strip {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+        
+        .giornata-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            cursor: help;
+        }
+        
+        .giornata-dot:hover {
+            transform: scale(1.2);
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .giornata-dot.titolare { background: var(--success); }
+        .giornata-dot.subentrante { background: var(--warning); color: #000; }
+        .giornata-dot.subentrante-sv { 
+            background: linear-gradient(135deg, var(--warning) 50%, var(--danger) 50%); 
+            color: #000; 
+        }
+        .giornata-dot.panchina { background: #666; }
+        .giornata-dot.infortunato { background: #9c27b0; }
+        .giornata-dot.assente { background: #555; }
+        .giornata-dot.non-giocata { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
         
         /* Riepilogo svincoli */
         .riepilogo-svincoli {
@@ -3238,6 +3663,539 @@
             });
         }
         
+        function buildFantacalcioUrl(nome, squadra, id) {
+            if (!nome || !squadra || !id) return null;
+            
+            // Normalizza squadra (lowercase, no spaces)
+            const squadraNorm = squadra.toLowerCase().trim().replace(/\s+/g, '-');
+            
+            // Normalizza nome (lowercase, remove accents, spaces -> dash, remove apostrophes)
+            const nomeNorm = nome.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents
+                .replace(/'/g, '') // Remove apostrophes
+                .trim()
+                .replace(/\s+/g, '-'); // Spaces to dashes
+            
+            return `https://www.fantacalcio.it/serie-a/squadre/${squadraNorm}/${nomeNorm}/${id}`;
+        }
+        
+        // Cache per i dati di titolarità già caricati
+        const titolaritaCache = {};
+        let lastTitolaritaFetch = 0;
+        const TITOLARITA_FETCH_DELAY = 2000; // 2 secondi tra richieste
+        
+        async function fetchTitolaritaData(playerUrl, playerName, retryCount = 0) {
+            // Check cache first
+            if (titolaritaCache[playerUrl]) {
+                return titolaritaCache[playerUrl];
+            }
+            
+            // Rate limiting: aspetta se l'ultima richiesta è troppo recente
+            const now = Date.now();
+            const timeSinceLastFetch = now - lastTitolaritaFetch;
+            if (timeSinceLastFetch < TITOLARITA_FETCH_DELAY) {
+                await new Promise(resolve => setTimeout(resolve, TITOLARITA_FETCH_DELAY - timeSinceLastFetch));
+            }
+            lastTitolaritaFetch = Date.now();
+            
+            try {
+                const response = await fetch(PROXY_URL + encodeURIComponent(playerUrl));
+                if (!response.ok) throw new Error('Errore nel caricamento');
+                
+                const html = await response.text();
+                const data = parseTitolaritaFromHtml(html, playerName);
+                
+                // Cache the result
+                titolaritaCache[playerUrl] = data;
+                return data;
+            } catch (error) {
+                console.error('Errore fetch titolarità:', error);
+                // Retry con backoff esponenziale (max 2 tentativi)
+                if (retryCount < 2) {
+                    const delay = (retryCount + 1) * 3000; // 3s, 6s
+                    console.log(`Retry ${retryCount + 1} tra ${delay/1000}s...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchTitolaritaData(playerUrl, playerName, retryCount + 1);
+                }
+                throw error;
+            }
+        }
+        
+        function parseTitolaritaFromHtml(html, playerName) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const giornate = [];
+            
+            // Find all rows in player-summary-table tbody (ogni riga è una giornata)
+            const rows = doc.querySelectorAll('.player-summary-table tbody tr:not(.divider)');
+            
+            rows.forEach((row, index) => {
+                const giornata = { numero: index + 1 };
+                
+                // Trova la cella matchweek nella riga
+                const matchweekCell = row.querySelector('.matchweek');
+                if (!matchweekCell) return;
+                
+                // Determine status from class - se ha una classe status-X la giornata è stata disputata
+                // status-0 = titolare, status-1 = subentrante, status-2 = infortunato/non disponibile
+                // status-3 = infortunato, status-4 = panchina
+                const hasStatus0 = matchweekCell.classList.contains('status-0');
+                const hasStatus1 = matchweekCell.classList.contains('status-1');
+                const hasStatus2 = matchweekCell.classList.contains('status-2'); // infortunato lungo / non disponibile
+                const hasStatus3 = matchweekCell.classList.contains('status-3');
+                const hasStatus4 = matchweekCell.classList.contains('status-4');
+                
+                // La giornata è disputata se ha uno qualsiasi degli status
+                giornata.disputata = hasStatus0 || hasStatus1 || hasStatus2 || hasStatus3 || hasStatus4;
+                
+                // Get grade/vote dalla RIGA (non dalla cella matchweek!)
+                // Il .grade è in una TD separata della stessa riga
+                const grade = row.querySelector('.grade');
+                const votoValue = grade ? grade.getAttribute('data-value') : null;
+                giornata.voto = votoValue ? parseFloat(votoValue.replace(',', '.')) : null;
+                giornata.haVoto = votoValue !== null && votoValue !== '';
+                
+                if (hasStatus0) {
+                    giornata.status = 'titolare';
+                } else if (hasStatus1) {
+                    // Subentrante: distingui se ha preso voto o no
+                    giornata.status = giornata.haVoto ? 'subentrante' : 'subentrante-sv'; // sv = senza voto
+                } else if (hasStatus2 || hasStatus3) {
+                    giornata.status = 'infortunato'; // status-2 e status-3 sono entrambi infortunio/indisponibilità
+                } else if (hasStatus4) {
+                    giornata.status = 'panchina';
+                } else {
+                    giornata.status = 'non-disputata'; // giornata non ancora giocata nel campionato
+                }
+                
+                // Get substitution minutes dalla RIGA
+                const subIn = row.querySelector('.sub-in');
+                const subOut = row.querySelector('.sub-out');
+                
+                if (subIn) {
+                    giornata.minIn = subIn.getAttribute('data-minute') || '';
+                }
+                if (subOut) {
+                    giornata.minOut = subOut.getAttribute('data-minute') || '';
+                }
+                
+                giornate.push(giornata);
+            });
+            
+            return {
+                playerName,
+                giornate,
+                timestamp: Date.now()
+            };
+        }
+        
+        function calcTitolaritaStats(data) {
+            // Filtra solo le giornate DISPUTATE (quelle che hanno uno status reale)
+            const giornateDisputate = data.giornate.filter(g => g.disputata);
+            const totale = giornateDisputate.length;
+            
+            if (totale === 0) {
+                return {
+                    titolare: 0,
+                    subentrante: 0,
+                    subentranteSV: 0,
+                    panchina: 0,
+                    infortunato: 0,
+                    totale: 0,
+                    percentualeTit: 0,
+                    percentualePresenza: 0,
+                    percentualeVoto: 0,
+                    trend: 'stable',
+                    trendText: 'Dati insufficienti',
+                    recentStats: null
+                };
+            }
+            
+            // Count by status sulle giornate disputate
+            const titolare = giornateDisputate.filter(g => g.status === 'titolare').length;
+            const subentrante = giornateDisputate.filter(g => g.status === 'subentrante').length;
+            const subentranteSV = giornateDisputate.filter(g => g.status === 'subentrante-sv').length; // senza voto
+            const panchina = giornateDisputate.filter(g => g.status === 'panchina').length;
+            const infortunato = giornateDisputate.filter(g => g.status === 'infortunato').length;
+            
+            const percentualeTit = Math.round((titolare / totale) * 100);
+            // Presenze CON voto (titolare + subentrante con voto)
+            const presenzeConVoto = titolare + subentrante;
+            const percentualePresenza = Math.round(((titolare + subentrante + subentranteSV) / totale) * 100);
+            const percentualeVoto = Math.round((presenzeConVoto / totale) * 100); // % giornate con voto
+            
+            // ===== CALCOLO TREND AVANZATO =====
+            let trend = 'stable';
+            let trendText = 'Situazione stabile';
+            let recentStats = null;
+            
+            if (giornateDisputate.length >= 3) {
+                // Prendi le ultime 5 giornate DISPUTATE (o meno se non disponibili)
+                const numRecent = Math.min(5, giornateDisputate.length);
+                const recent = giornateDisputate.slice(-numRecent);
+                
+                const recentTit = recent.filter(g => g.status === 'titolare').length;
+                const recentSub = recent.filter(g => g.status === 'subentrante').length;
+                const recentSubSV = recent.filter(g => g.status === 'subentrante-sv').length;
+                const recentPanc = recent.filter(g => g.status === 'panchina').length;
+                const recentInf = recent.filter(g => g.status === 'infortunato').length;
+                const recentPercTit = (recentTit / numRecent) * 100;
+                const recentPercVoto = ((recentTit + recentSub) / numRecent) * 100;
+                
+                recentStats = {
+                    titolare: recentTit,
+                    subentrante: recentSub,
+                    subentranteSV: recentSubSV,
+                    panchina: recentPanc,
+                    infortunato: recentInf,
+                    percentuale: Math.round(recentPercTit),
+                    percentualeVoto: Math.round(recentPercVoto),
+                    giornate: recent.map(g => g.numero),
+                    dettaglio: recent.map(g => ({ numero: g.numero, status: g.status }))
+                };
+                
+                // ===== ANALISI MULTI-FATTORE =====
+                let trendScore = 0; // da -100 a +100
+                let trendReasons = [];
+                
+                // 1. CONFRONTO ULTIME 5 vs PRECEDENTI 5 (peso: 30%)
+                if (giornateDisputate.length >= 8) {
+                    const prev5 = giornateDisputate.slice(-10, -5);
+                    if (prev5.length >= 3) {
+                        const prevTit = prev5.filter(g => g.status === 'titolare').length;
+                        const prevPercTit = (prevTit / prev5.length) * 100;
+                        const diffVsPrev = recentPercTit - prevPercTit;
+                        
+                        if (diffVsPrev >= 40) {
+                            trendScore += 30;
+                            trendReasons.push('Netto miglioramento vs periodo precedente');
+                        } else if (diffVsPrev >= 20) {
+                            trendScore += 20;
+                            trendReasons.push('Miglioramento vs periodo precedente');
+                        } else if (diffVsPrev <= -40) {
+                            trendScore -= 30;
+                            trendReasons.push('Netto peggioramento vs periodo precedente');
+                        } else if (diffVsPrev <= -20) {
+                            trendScore -= 20;
+                            trendReasons.push('Peggioramento vs periodo precedente');
+                        }
+                    }
+                }
+                
+                // 2. SEQUENZA CONSECUTIVA RECENTE (peso: 25%)
+                // Analizza le ultime 3 giornate per pattern
+                const last3 = recent.slice(-3);
+                const last3Tit = last3.filter(g => g.status === 'titolare').length;
+                const last3Panc = last3.filter(g => g.status === 'panchina').length;
+                const last3Inf = last3.filter(g => g.status === 'infortunato').length;
+                
+                if (last3Tit === 3) {
+                    trendScore += 25;
+                    trendReasons.push('3 titolarità consecutive');
+                } else if (last3Tit >= 2 && last3[last3.length - 1].status === 'titolare') {
+                    trendScore += 15;
+                    trendReasons.push('Titolare nelle ultime partite');
+                } else if (last3Panc === 3) {
+                    trendScore -= 25;
+                    trendReasons.push('3 panchine consecutive');
+                } else if (last3Panc >= 2 && last3[last3.length - 1].status === 'panchina') {
+                    trendScore -= 15;
+                    trendReasons.push('In panchina nelle ultime partite');
+                }
+                
+                // 3. ULTIMA GIORNATA (peso: 20%)
+                const ultimaGiornata = recent[recent.length - 1];
+                if (ultimaGiornata.status === 'titolare') {
+                    trendScore += 10;
+                } else if (ultimaGiornata.status === 'panchina') {
+                    trendScore -= 15;
+                    trendReasons.push('Ultima giornata in panchina');
+                } else if (ultimaGiornata.status === 'infortunato') {
+                    trendScore -= 10;
+                    trendReasons.push('Ultima giornata infortunato');
+                } else if (ultimaGiornata.status === 'subentrante-sv') {
+                    trendScore -= 5;
+                }
+                
+                // 4. RITORNO DA INFORTUNIO (peso: 15%)
+                // Se era infortunato e ora gioca = positivo
+                const hadRecentInjury = recent.slice(0, -1).some(g => g.status === 'infortunato');
+                if (hadRecentInjury && (ultimaGiornata.status === 'titolare' || ultimaGiornata.status === 'subentrante')) {
+                    trendScore += 15;
+                    trendReasons.push('Tornato dall\'infortunio e subito in campo');
+                } else if (recentInf >= 2) {
+                    trendScore -= 15;
+                    trendReasons.push('Problemi fisici ricorrenti');
+                }
+                
+                // 5. PATTERN PROGRESSIVO (peso: 10%)
+                // Verifica se c'è un trend crescente o decrescente nelle ultime giornate
+                if (numRecent >= 4) {
+                    const firstHalf = recent.slice(0, Math.floor(numRecent / 2));
+                    const secondHalf = recent.slice(Math.floor(numRecent / 2));
+                    const firstHalfTit = firstHalf.filter(g => g.status === 'titolare').length / firstHalf.length;
+                    const secondHalfTit = secondHalf.filter(g => g.status === 'titolare').length / secondHalf.length;
+                    
+                    if (secondHalfTit > firstHalfTit + 0.3) {
+                        trendScore += 10;
+                        trendReasons.push('Trend in crescita progressiva');
+                    } else if (secondHalfTit < firstHalfTit - 0.3) {
+                        trendScore -= 10;
+                        trendReasons.push('Trend in calo progressivo');
+                    }
+                }
+                
+                // ===== DETERMINA TREND FINALE =====
+                if (trendScore >= 40) {
+                    trend = 'positive';
+                    trendText = 'In forte crescita!';
+                } else if (trendScore >= 20) {
+                    trend = 'positive';
+                    trendText = 'Tendenza positiva';
+                } else if (trendScore <= -40) {
+                    trend = 'negative';
+                    trendText = 'In forte calo!';
+                } else if (trendScore <= -20) {
+                    trend = 'negative';
+                    trendText = 'Tendenza negativa';
+                } else {
+                    trend = 'stable';
+                    trendText = 'Situazione stabile';
+                }
+                
+                // Aggiungi motivo principale se disponibile
+                if (trendReasons.length > 0) {
+                    trendText += ` - ${trendReasons[0]}`;
+                }
+                
+                // Salva info aggiuntive per debug/display
+                recentStats.trendScore = trendScore;
+                recentStats.trendReasons = trendReasons;
+            }
+            
+            return {
+                titolare,
+                subentrante,
+                subentranteSV,
+                panchina,
+                infortunato,
+                totale,
+                percentualeTit,
+                percentualePresenza,
+                percentualeVoto,
+                trend,
+                trendText,
+                recentStats
+            };
+        }
+        
+        function showTitolaritaPopup(data) {
+            // Remove any existing popup
+            closeTitolaritaPopup();
+            
+            const stats = calcTitolaritaStats(data);
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'titolarita-popup-overlay';
+            overlay.onclick = closeTitolaritaPopup;
+            
+            const popup = document.createElement('div');
+            popup.className = 'titolarita-popup';
+            
+            // Build giornate strip - mostra solo le giornate disputate
+            let giornateStrip = '<div class="giornate-strip">';
+            data.giornate.forEach(g => {
+                let dotClass = 'non-giocata';
+                let statusText = 'Non disputata';
+                
+                if (g.disputata) {
+                    if (g.status === 'titolare') {
+                        dotClass = 'titolare';
+                        statusText = 'Titolare';
+                    } else if (g.status === 'subentrante') {
+                        dotClass = 'subentrante';
+                        statusText = 'Subentrante (con voto)';
+                    } else if (g.status === 'subentrante-sv') {
+                        dotClass = 'subentrante-sv';
+                        statusText = 'Subentrante SENZA VOTO';
+                    } else if (g.status === 'panchina') {
+                        dotClass = 'panchina';
+                        statusText = 'Panchina';
+                    } else if (g.status === 'infortunato') {
+                        dotClass = 'infortunato';
+                        statusText = 'Infortunato';
+                    }
+                }
+                
+                giornateStrip += `<span class="giornata-dot ${dotClass}" title="G${g.numero}: ${statusText}">${g.numero}</span>`;
+            });
+            giornateStrip += '</div>';
+            
+            // Info sulle ultime 5 giornate disputate - dettaglio completo
+            let ultime5Info = '';
+            let trendDetails = '';
+            if (stats.recentStats) {
+                const r = stats.recentStats;
+                
+                // Mostra le ultime giornate con icone
+                let recentIcons = r.dettaglio.map(d => {
+                    if (d.status === 'titolare') return '🟢';
+                    if (d.status === 'subentrante') return '🟡';
+                    if (d.status === 'subentrante-sv') return '🟠';
+                    if (d.status === 'panchina') return '⬛';
+                    if (d.status === 'infortunato') return '🟣';
+                    return '⚪';
+                }).join(' ');
+                
+                ultime5Info = `
+                    <div class="recent-games">
+                        <div class="recent-games-title">Ultime ${r.giornate.length} giornate</div>
+                        <div class="recent-games-icons">
+                            ${recentIcons}
+                            <span class="recent-games-label">G${r.giornate.join(', G')}</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Mostra altri motivi del trend se disponibili
+                if (r.trendReasons && r.trendReasons.length > 1) {
+                    trendDetails = '<div class="trend-reasons">';
+                    trendDetails += r.trendReasons.slice(1).map(reason => `• ${reason}`).join('<br>');
+                    trendDetails += '</div>';
+                }
+            }
+            
+            popup.innerHTML = `
+                <button class="close-btn" onclick="closeTitolaritaPopup()">&times;</button>
+                <h3>📊 ${data.playerName}</h3>
+                
+                <div class="titolarita-stats">
+                    <div class="titolarita-stat titolare">
+                        <div class="value">${stats.percentualeTit}%</div>
+                        <div class="label">Titolarità</div>
+                    </div>
+                    <div class="titolarita-stat info">
+                        <div class="value">${stats.percentualeVoto}%</div>
+                        <div class="label">Con Voto</div>
+                    </div>
+                    <div class="titolarita-stat titolare">
+                        <div class="value">${stats.titolare}</div>
+                        <div class="label">Titolare</div>
+                    </div>
+                    <div class="titolarita-stat ${stats.subentranteSV > 0 ? 'mixed' : 'subentrante'}">
+                        <div class="value">${stats.subentrante}${stats.subentranteSV > 0 ? `<small style="font-size:0.6em;color:var(--danger)">+${stats.subentranteSV}</small>` : ''}</div>
+                        <div class="label">Subentrante</div>
+                    </div>
+                </div>
+                
+                <div class="titolarita-trend ${stats.trend}">
+                    <h4>📈 Analisi Trend</h4>
+                    <div class="trend-indicator ${stats.trend}">
+                        <span class="trend-icon">${stats.trend === 'positive' ? '📈' : stats.trend === 'negative' ? '📉' : '➡️'}</span>
+                        <span>${stats.trendText}</span>
+                    </div>
+                    ${ultime5Info}
+                    ${trendDetails}
+                </div>
+                
+                <div class="titolarita-detail">
+                    <div class="titolarita-detail-title">📋 Dettaglio Completo (${stats.totale} giornate)</div>
+                    
+                    <div class="stats-breakdown">
+                        ${stats.titolare > 0 ? `
+                        <div class="stat-bar-item titolare">
+                            <div class="stat-bar-header">
+                                <span class="stat-bar-label">🟢 Titolare</span>
+                                <span class="stat-bar-value">${stats.titolare}</span>
+                            </div>
+                            <div class="stat-bar-progress">
+                                <div class="stat-bar-fill" style="width: ${(stats.titolare/stats.totale*100)}%"></div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${stats.subentrante > 0 ? `
+                        <div class="stat-bar-item subentrante">
+                            <div class="stat-bar-header">
+                                <span class="stat-bar-label">🟡 Subentrante</span>
+                                <span class="stat-bar-value">${stats.subentrante}</span>
+                            </div>
+                            <div class="stat-bar-progress">
+                                <div class="stat-bar-fill" style="width: ${(stats.subentrante/stats.totale*100)}%"></div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${stats.subentranteSV > 0 ? `
+                        <div class="stat-bar-item subentrante-sv">
+                            <div class="stat-bar-header">
+                                <span class="stat-bar-label">🟠 Sub. S.V.</span>
+                                <span class="stat-bar-value">${stats.subentranteSV}</span>
+                            </div>
+                            <div class="stat-bar-progress">
+                                <div class="stat-bar-fill" style="width: ${(stats.subentranteSV/stats.totale*100)}%"></div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${stats.panchina > 0 ? `
+                        <div class="stat-bar-item panchina">
+                            <div class="stat-bar-header">
+                                <span class="stat-bar-label">⬛ Panchina</span>
+                                <span class="stat-bar-value">${stats.panchina}</span>
+                            </div>
+                            <div class="stat-bar-progress">
+                                <div class="stat-bar-fill" style="width: ${(stats.panchina/stats.totale*100)}%"></div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${stats.infortunato > 0 ? `
+                        <div class="stat-bar-item infortunato">
+                            <div class="stat-bar-header">
+                                <span class="stat-bar-label">🟣 Infortunato</span>
+                                <span class="stat-bar-value">${stats.infortunato}</span>
+                            </div>
+                            <div class="stat-bar-progress">
+                                <div class="stat-bar-fill" style="width: ${(stats.infortunato/stats.totale*100)}%"></div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${giornateStrip}
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+        }
+        
+        function closeTitolaritaPopup() {
+            const overlay = document.querySelector('.titolarita-popup-overlay');
+            const popup = document.querySelector('.titolarita-popup');
+            if (overlay) overlay.remove();
+            if (popup) popup.remove();
+        }
+        
+        async function loadPlayerTitolarita(button, playerUrl, playerName) {
+            if (button.classList.contains('loading')) return;
+            
+            button.classList.add('loading');
+            button.innerHTML = '⏳';
+            
+            try {
+                const data = await fetchTitolaritaData(playerUrl, playerName);
+                showTitolaritaPopup(data);
+            } catch (error) {
+                alert('Errore nel caricamento dei dati di titolarità. Riprova più tardi.');
+            } finally {
+                button.classList.remove('loading');
+                button.innerHTML = '📊';
+            }
+        }
+        
         function renderSquadre(preserveExpanded = false) {
             const container = document.getElementById('squadre-container');
             
@@ -3254,12 +4212,33 @@
                 const numSvincolati = calciatori.filter(c => appData.svincoli[c.nome]).length;
                 const safeId = sq.replace(/[^a-zA-Z0-9]/g, '_');
                 
+                // Count svincolati by role
+                const svincolatiPerRuolo = { 'P': 0, 'D': 0, 'C': 0, 'A': 0 };
+                calciatori.forEach(cal => {
+                    if (appData.svincoli[cal.nome] && svincolatiPerRuolo.hasOwnProperty(cal.ruolo)) {
+                        svincolatiPerRuolo[cal.ruolo]++;
+                    }
+                });
+                
+                // Build role summary badges (only show if there are svincolati)
+                let roleSummary = '';
+                if (numSvincolati > 0) {
+                    roleSummary = '<span class="svincoli-summary">';
+                    ['P', 'D', 'C', 'A'].forEach(ruolo => {
+                        if (svincolatiPerRuolo[ruolo] > 0) {
+                            roleSummary += `<span class="ruolo-badge ${ruolo}">${svincolatiPerRuolo[ruolo]}</span>`;
+                        }
+                    });
+                    roleSummary += '</span>';
+                }
+                
                 return `
                     <div class="squadra-section" id="squadra-${safeId}">
                         <div class="squadra-header collapsed" onclick="toggleSquadra('${safeId}')">
                             <h3>
                                 ${sq}
                                 <span class="counter">(${numSvincolati}/${calciatori.length} svincolati)</span>
+                                ${roleSummary}
                             </h3>
                             <span class="toggle-icon">▼</span>
                         </div>
@@ -3272,6 +4251,8 @@
                                     <tr>
                                         <th>Svincola</th>
                                         <th>Nome</th>
+                                        <th>PGv</th>
+                                        <th>MV</th>
                                         <th>Ruolo</th>
                                         <th>Squadra</th>
                                         <th>Costo</th>
@@ -3286,6 +4267,9 @@
                                         const rowClass = cal.fuoriLista ? 'fuori-lista' : (isSvincolato ? 'svincolato' : '');
                                         const infortunatoClass = infortunatoInfo ? ' infortunato' : '';
                                         const nuovoArrivo = isNuovoArrivo(cal.nome, cal.squadra);
+                                        const playerUrl = buildFantacalcioUrl(cal.nome, cal.squadra, cal.id);
+                                        const playerLink = playerUrl ? `<a href="${playerUrl}" target="_blank" class="player-info-link" title="Vedi su Fantacalcio.it">🔍</a>` : '';
+                                        const titolaritaBtn = playerUrl ? `<button class="player-titolarita-btn" onclick="loadPlayerTitolarita(this, '${playerUrl}', '${cal.nome.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Analizza titolarità">📊 Titolarità</button>` : '';
                                         return `
                                             <tr class="${rowClass}${infortunatoClass}">
                                                 <td>
@@ -3293,7 +4277,9 @@
                                                         ${isSvincolato ? 'checked' : ''} 
                                                         onchange="toggleSvincolo('${cal.nome.replace(/'/g, "\\'")}', this.checked)">
                                                 </td>
-                                                <td>${cal.nome}${cal.fuoriLista ? ' ⚠️' : ''}${nuovoArrivo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}${infortunatoInfo ? `<span class="infortunato-badge" data-tooltip="${infortunatoInfo.descrizione}">🏥 INF</span>` : ''}</td>
+                                                <td>${cal.nome}${playerLink}${titolaritaBtn}${cal.fuoriLista ? ' ⚠️' : ''}${nuovoArrivo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}${infortunatoInfo ? `<span class="infortunato-badge" data-tooltip="${infortunatoInfo.descrizione}">🏥 INF</span>` : ''}</td>
+                                                <td>${cal.pgv || '-'}</td>
+                                                <td>${cal.mv ? cal.mv.toFixed(2) : '-'}</td>
                                                 <td>${cal.ruolo}</td>
                                                 <td>${cal.squadra}</td>
                                                 <td>${cal.costo}</td>
@@ -3709,14 +4695,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.map(cal => `
+                        ${data.map(cal => {
+                            const playerUrl = buildFantacalcioUrl(cal.nome, cal.squadra, cal.id);
+                            const playerLink = playerUrl ? `<a href="${playerUrl}" target="_blank" class="player-info-link" title="Vedi su Fantacalcio.it">🔍</a>` : '';
+                            const titolaritaBtn = playerUrl ? `<button class="player-titolarita-btn" onclick="loadPlayerTitolarita(this, '${playerUrl}', '${cal.nome.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Analizza titolarità">📊 Titolarità</button>` : '';
+                            return `
                             <tr class="${cal.preferenza > 0 ? 'preferito' : ''}${cal.isNuovo ? ' nuovo-arrivo' : ''}${cal.rilasciatoDa ? ' rilasciato' : ''}${cal.isAcquistato ? ' acquistato' : ''}${cal.infortunatoInfo ? ' infortunato' : ''}">
                                 <td class="stars-cell no-strike">
                                     ${renderStars(cal.nome, cal.preferenza, ruolo, tabId)}
                                 </td>
                                 <td>${cal.id}</td>
                                 <td>
-                                    ${cal.nome}
+                                    ${cal.nome}${playerLink}${titolaritaBtn}
                                     ${cal.isNuovo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}
                                     ${cal.rilasciatoDa ? `<span class="rilasciato-badge" title="Rilasciato da ${cal.rilasciatoDa}">🔓 ${cal.rilasciatoDa}</span>` : ''}
                                     ${cal.isAcquistato ? '<span class="acquistato-badge">PRESO</span>' : ''}
@@ -3737,7 +4727,7 @@
                                     </button>
                                 </td>
                             </tr>
-                        `).join('')}
+                        `;}).join('')}
                     </tbody>
                 </table>
             `;
