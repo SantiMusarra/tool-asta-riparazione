@@ -1,17 +1,17 @@
-# 🎯 Asta di Riparazione - Fantacalcio Tool
+# 🏆 Fanta Rescue - Fantacalcio Tool
 
-Tool interattivo per gestire l'asta di riparazione del fantacalcio. **100% browser, nessuna installazione!**
+Tool gratuito per preparare l'asta di riparazione del Fantacalcio. **100% browser, nessuna installazione!**
 
-## 📋 Descrizione
+## 📋 Cosa puoi fare
 
-Pagina HTML standalone che elabora la lista dei calciatori della tua lega e fornisce:
-- 💰 Budget disponibile per ogni fantasquadra (configurabile)
-- 🔄 Gestione svincoli con recupero crediti automatico
-- ⭐ Sistema preferenze personali (1-5 stelle)
-- 🆕 Evidenziazione nuovi arrivi dal mercato
-- 📊 Elenco calciatori svincolati suddivisi per ruolo con filtri avanzati
-- 💾 Persistenza delle selezioni nel browser (per lega)
-- 🔒 Tutti i dati elaborati localmente (privacy garantita)
+- Vedi le rose e i budget di tutte le squadre della lega
+- Segna gli svincoli e calcola i rimborsi automaticamente
+- Esplora gli svincolati per ruolo con statistiche e quotazioni
+- Segna i tuoi preferiti e tieni traccia di chi è già stato preso
+- Visualizza infortunati e nuovi arrivi dal mercato
+
+> 🔒 **Privacy:** Tutto funziona nel browser, nessun dato viene inviato online.
+> I dati non si sincronizzano tra dispositivi diversi.
 
 ---
 
@@ -23,34 +23,36 @@ Pagina HTML standalone che elabora la lista dei calciatori della tua lega e forn
 2. **Carica** il file Excel della tua lega (drag & drop o click)
 3. **Fatto!** La pagina elabora tutto automaticamente
 
-> 💡 Funziona completamente offline! Nessun dato viene inviato a server esterni.
+> 💡 Funziona completamente offline! 
+
+---
+
+## 📥 Come ottenere il file della lega
+
+1. Apri il **sito web** [leghe.fantacalcio.it](https://leghe.fantacalcio.it/) (non l'app!)
+2. Seleziona la tua lega dal menu in alto
+3. Clicca su **Lista Calciatori**
+4. Assicurati che "Solo svincolati" sia **disattivato**
+5. Clicca **Scarica** → **Lista completa**
+
+> ⚠️ **Non rinominare il file!** Il nome della lega viene estratto automaticamente dal nome del file.
 
 ---
 
 ## 🌐 Hosting
 
-### Opzione 1: Firebase Hosting (Consigliato)
-```bash
-npm install -g firebase-tools
-firebase login
-cd /percorso/asta_riparazione
-firebase init hosting  # Directory: . | SPA: No | Overwrite: No
-firebase deploy
-```
-URL: `https://tuo-progetto.web.app`
-
-### Opzione 2: GitHub Pages
+### Opzione 1: GitHub Pages (Consigliato)
 1. Crea un repository su GitHub
 2. Pusha il codice
 3. Settings → Pages → Source: main branch
 4. URL: `https://username.github.io/repo-name`
 
-### Opzione 3: Netlify Drop
+### Opzione 2: Netlify Drop
 1. Vai su [app.netlify.com/drop](https://app.netlify.com/drop)
 2. Trascina la cartella del progetto
 3. Ottieni subito un URL pubblico
 
-### Opzione 4: Condivisione diretta
+### Opzione 3: Condivisione diretta
 Essendo un singolo file HTML, puoi semplicemente inviare `index.html` via email/chat!
 
 ---
@@ -58,41 +60,14 @@ Essendo un singolo file HTML, puoi semplicemente inviare `index.html` via email/
 ## 📁 Struttura Progetto
 
 ```
-asta_riparazione/
-├── index.html    ← App standalone (apri questo!)
-└── README.md     ← Documentazione
+fanta-rescue/
+├── index.html           ← App standalone (apri questo!)
+├── README.md            ← Documentazione
+└── screenshots/         ← Screenshot per le istruzioni
+    ├── step1-menu-lega.png
+    ├── step1-menu-mobile.jpeg
+    └── step2-scarica-lista.png
 ```
-
----
-
-## 📥 Input
-
-### File richiesto
-- **Formato:** Excel (.xlsx o .xls)
-- **Origine:** Scaricato da [leghe.fantacalcio.it](https://leghe.fantacalcio.it/)
-- **Importante:** Non rinominare il file! Il nome della lega viene estratto automaticamente
-
-### Come ottenere il file
-1. Accedi a [leghe.fantacalcio.it](https://leghe.fantacalcio.it/)
-2. Seleziona la tua lega
-3. Vai in **Lista Svincolati**
-4. Togli la spunta da "Solo svincolati"
-5. Clicca **Scarica** → **Lista completa**
-
-### Colonne richieste
-
-| Colonna | Descrizione |
-|---------|-------------|
-| `Nome` | Nome del calciatore |
-| `R.` | Ruolo (P/D/C/A) |
-| `Sq.` | Squadra di Serie A |
-| `PGv` | Partite giocate (a voto) |
-| `MV` | Media voto |
-| `FM` | FantaMedia |
-| `QUOT.` | Quotazione attuale |
-| `FantaSquadra` | Fantasquadra (vuoto se svincolato) |
-| `Costo` | Costo all'asta iniziale |
-| `Fuori lista` | `*` se fuori lista |
 
 ---
 
@@ -103,7 +78,7 @@ asta_riparazione/
 | Tab | Contenuto |
 |-----|-----------|
 | **🏠 Home** | Budget squadre, gestione svincoli, ricerca rapida, riepilogo |
-| **⚙️ Configurazione** | Impostazioni lega, regole rimborso, caricamento mercato |
+| **⚙️ Configurazione** | Impostazioni lega, regole rimborso, infortunati, trasferimenti |
 | **🧤 Portieri** | Portieri svincolati con filtri |
 | **🛡️ Difensori** | Difensori svincolati con filtri |
 | **⚽ Centrocampisti** | Centrocampisti svincolati con filtri |
@@ -115,14 +90,15 @@ asta_riparazione/
 |---------|-------------|
 | ⚠️ | Fuori Lista (non acquistabile) |
 | 🆕 NEW | Nuovo arrivo dal mercato |
+| 🏥 INF | Giocatore infortunato |
 | ⭐ | Preferenza personale (1-5 stelle) |
 | 🔓 | Già svincolato (nella ricerca rapida) |
+| PRESO | Acquistato da un'altra squadra |
 | ✅ Riga verde | Giocatore svincolato |
-| 🔄 Rilasciato | Giocatore rilasciato da una fantasquadra |
 
 ---
 
-## ⚙️ Configurazione Lega
+## ⚙️ Configurazione
 
 ### Parametri Budget
 
@@ -131,6 +107,8 @@ asta_riparazione/
 | Budget iniziale | 500 | Crediti iniziali per squadra |
 | Crediti aggiuntivi | 50 | Crediti extra per riparazione |
 | Budget per squadra | Auto | `Budget iniziale - Costo rosa` |
+
+> ⚠️ Se ci sono stati scambi tra squadre durante la stagione, ricorda di correggere manualmente i budget residui!
 
 ### Regole Rimborso
 
@@ -142,10 +120,30 @@ asta_riparazione/
 
 ---
 
+## 🏥 Infortunati (Opzionale)
+
+Puoi caricare la lista degli infortunati per evidenziarli nelle tabelle:
+
+### Metodo automatico (consigliato)
+Clicca "🔄 Aggiorna automaticamente" nella sezione Configurazione.
+
+### Metodo manuale
+1. Vai su [fantacalcio.it/infortunati-serie-a](https://www.fantacalcio.it/infortunati-serie-a)
+2. Salva la pagina come HTML (`Cmd+S` / `Ctrl+S`)
+3. Carica il file nella sezione Configurazione
+
+Gli infortunati verranno evidenziati con il badge **🏥 INF** e un tooltip con i dettagli.
+
+---
+
 ## 🆕 Nuovi Arrivi dal Mercato (Opzionale)
 
 Puoi caricare i trasferimenti ufficiali per evidenziare i nuovi acquisti:
 
+### Metodo automatico (consigliato)
+Clicca "🔄 Aggiorna automaticamente" nella sezione Configurazione.
+
+### Metodo manuale
 1. Vai su [fantacalcio.it/trasferimenti-ufficiali](https://www.fantacalcio.it/calciomercato/trasferimenti-ufficiali)
 2. Salva la pagina come HTML (`Cmd+S` / `Ctrl+S`)
 3. Carica il file nella sezione Configurazione
@@ -167,17 +165,7 @@ I nuovi arrivi verranno evidenziati con il badge **NEW** nelle tabelle.
 3. Il budget si aggiorna automaticamente
 
 ### Giocatori rilasciati
-Quando svincoli un giocatore che non è fuori lista, questo torna disponibile nelle tabelle degli svincolati con il badge "Rilasciato da [Squadra]".
-
----
-
-## 📊 Indice Affidabilità
-
-**Formula:** `PGv × FM`
-
-Premia i calciatori che:
-- ✅ Giocano con continuità (alto PGv)
-- ✅ Hanno buone prestazioni (alta FM)
+Quando svincoli un giocatore, questo torna disponibile nelle tabelle degli svincolati con il badge "Rilasciato da [Squadra]".
 
 ---
 
@@ -191,14 +179,27 @@ Ogni tab dei ruoli include:
 - ⭐ Filtro preferiti (1-5 stelle)
 - 🆕 Solo nuovi arrivi
 - 🔄 Filtro rilasciati
+- ❌ Filtro acquistati
+- 🏥 Filtro infortunati
+- ✖ Pulisci filtri (reset ai valori default)
 
-Le tabelle sono **ordinabili** cliccando sulle intestazioni.
+Le tabelle sono **ordinabili** cliccando sulle intestazioni. L'ordinamento viene mantenuto anche quando si assegnano le stelle.
+
+> 💡 I giocatori con stelle (preferiti) appaiono sempre in cima alla tabella!
+
+---
+
+## 📊 Indice Affidabilità
+
+**Formula:** `PGv × FM`
+
+Premia i calciatori che:
+- ✅ Giocano con continuità (alto PGv)
+- ✅ Hanno buone prestazioni (alta FM)
 
 ---
 
 ## 💾 Persistenza Dati
-
-I dati sono salvati nel browser e associati al nome della tua lega:
 
 | Dato | Persistenza |
 |------|-------------|
@@ -206,9 +207,13 @@ I dati sono salvati nel browser e associati al nome della tua lega:
 | Configurazione budget | ✅ Per lega |
 | Regole rimborso | ✅ Per lega |
 | Preferenze giocatori | ✅ Per lega |
-| Nuovi arrivi mercato | ✅ Per lega |
+| Giocatori acquistati | ✅ Per lega |
+| Infortunati | ✅ Globale (tutte le leghe) |
+| Nuovi arrivi mercato | ✅ Globale (tutte le leghe) |
 
 > 💡 Puoi gestire più leghe! Ogni file caricato mantiene i propri dati separati.
+
+> ⚠️ **No sync:** I dati sono salvati solo su questo dispositivo/browser. Se usi il tool da un altro dispositivo, dovrai ricaricare il file e rifare le selezioni.
 
 ---
 
@@ -221,6 +226,8 @@ I dati sono salvati nel browser e associati al nome della tua lega:
 | Smartphone | ⚠️ Funziona, esperienza limitata |
 
 > Il tool è ottimizzato per schermi larghi a causa delle tabelle estese.
+
+> ⚠️ **Nota:** Questo tool è ottimizzato per la modalità **Classic**. La modalità **Mantra** potrebbe non essere completamente supportata.
 
 ---
 
@@ -239,12 +246,26 @@ I dati sono salvati nel browser e associati al nome della tua lega:
 2. 🌐 Apri il tool (locale o online)
 3. 📂 Carica il file Excel
 4. ⚙️ Configura budget e regole (solo la prima volta)
-5. 🔄 Gestisci gli svincoli
-6. 📋 Consulta gli svincolati disponibili
-7. 🔁 Ripeti quando i dati cambiano (le selezioni persistono!)
+5. 🏥 Carica infortunati e trasferimenti (opzionale, con auto-fetch)
+6. 🔄 Gestisci gli svincoli
+7. ⭐ Segna i tuoi preferiti
+8. 📋 Consulta gli svincolati disponibili
+9. 🔁 Ripeti quando i dati cambiano (le selezioni persistono!)
 
 ---
 
 ## 📄 Licenza
 
-MIT License - Usa liberamente!
+Questo progetto è rilasciato sotto licenza **GNU General Public License v3.0 (GPL-3.0)**.
+
+Se distribuisci questo software o versioni modificate:
+- Devi includere il codice sorgente o renderlo disponibile
+- Devi mantenere la stessa licenza GPL-3.0
+- Devi indicare le modifiche effettuate
+- Devi mantenere gli avvisi di copyright originali
+
+Per il testo completo della licenza, consulta: https://www.gnu.org/licenses/gpl-3.0.html
+
+---
+## ⚠️ Disclaimer
+*Fanta Rescue non è affiliato con Fantacalcio.it o altre piattaforme ufficiali.*
