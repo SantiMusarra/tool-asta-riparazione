@@ -1533,6 +1533,209 @@
             padding: 20px;
         }
         
+        /* Riepilogo Acquisti */
+        .riepilogo-acquisti {
+            background: var(--bg-card);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--success);
+        }
+        
+        .riepilogo-acquisti .riepilogo-header {
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .riepilogo-acquisti .riepilogo-header h3 {
+            color: var(--success);
+        }
+        
+        .acquisto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 10px;
+        }
+        
+        .acquisto-item:last-child {
+            border-bottom: none;
+        }
+        
+        .acquisto-info {
+            flex: 1;
+        }
+        
+        .acquisto-nome {
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        .acquisto-dettagli {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .acquisto-costo {
+            font-weight: bold;
+            color: var(--success);
+            font-size: 1.1rem;
+        }
+        
+        .acquisto-remove {
+            background: var(--danger);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .acquisto-remove:hover {
+            background: #c0392b;
+        }
+        
+        /* Modal Acquisto */
+        .acquisto-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .acquisto-modal {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .acquisto-modal h3 {
+            margin: 0 0 5px 0;
+            color: var(--accent);
+        }
+        
+        .acquisto-modal .player-name {
+            font-size: 1.2rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+        
+        .acquisto-modal .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .acquisto-modal label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .acquisto-modal select,
+        .acquisto-modal input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-main);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .acquisto-modal select:focus,
+        .acquisto-modal input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .acquisto-modal .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .acquisto-modal .buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .acquisto-modal .btn-confirm {
+            background: var(--success);
+            color: white;
+        }
+        
+        .acquisto-modal .btn-confirm:hover {
+            background: #45a049;
+        }
+        
+        .acquisto-modal .btn-cancel {
+            background: var(--bg-main);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .acquisto-modal .btn-cancel:hover {
+            background: var(--border);
+        }
+        
+        .acquisto-modal .btn-remove {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .acquisto-modal .btn-remove:hover {
+            background: #c0392b;
+        }
+        
+        /* Btn acquistato nelle tabelle */
+        .btn-acquistato {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        
+        .btn-acquistato:hover {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        
+        .btn-acquistato.active {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        
+        .btn-acquistato.active:hover {
+            background: var(--warning);
+            border-color: var(--warning);
+        }
+
         /* Filters */
         .filters {
             display: flex;
@@ -1860,13 +2063,14 @@
         }
         
         .acquistato-badge {
-            background: linear-gradient(135deg, #636e72, #b2bec3);
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
-            font-size: 0.6rem;
-            padding: 2px 6px;
+            font-size: 0.65rem;
+            padding: 3px 8px;
             border-radius: 4px;
             margin-left: 5px;
-            font-weight: normal;
+            font-weight: bold;
+            white-space: nowrap;
         }
         
         .btn-acquistato {
@@ -2218,7 +2422,7 @@
                         <span class="legenda-item">🔓 Già svincolato (ricerca rapida)</span>
                         <span class="legenda-item">⭐ Preferenza personale (1-5 stelle)</span>
                         <span class="legenda-item" style="color: var(--success)">✅ Riga verde = giocatore svincolato</span>
-                        <span class="legenda-item"><span class="acquistato-badge">PRESO</span> Acquistato da un'altra squadra</span>
+                        <span class="legenda-item"><span class="acquistato-badge">→ TeamX (5cr)</span> Acquistato da altra squadra</span>
                     </div>
                 </div>
                 
@@ -2241,6 +2445,15 @@
                     </div>
                     <p class="help-text" style="padding: 0 15px;">Elenco di tutti i calciatori svincolati con il rimborso calcolato secondo le regole configurate.</p>
                     <div class="riepilogo-content" id="riepilogo-content"></div>
+                </div>
+                
+                <div class="riepilogo-acquisti">
+                    <div class="riepilogo-header" onclick="toggleRiepilogoAcquisti()">
+                        <h3>🛒 Riepilogo Acquisti (<span id="count-acquisti">0</span>)</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <p class="help-text" style="padding: 0 15px;">Elenco di tutti i calciatori acquistati dalle squadre della lega.</p>
+                    <div class="riepilogo-content" id="riepilogo-acquisti-content"></div>
                 </div>
                 
                 <div id="squadre-container"></div>
@@ -2482,7 +2695,7 @@
             svincolati: { P: [], D: [], C: [], A: [] },
             svincoli: {},  // { nomeCalciatore: true }
             preferenze: {}, // { nomeCalciatore: 1-5 }
-            acquistati: {}, // { nomeCalciatore: true } - giocatori svincolati presi da altri
+            acquistati: {}, // { nomeCalciatore: { nome, id, squadra, costo } } - giocatori acquistati da squadre della lega
             nuoviArrivi: {}, // { squadraSerieA: [nome1, nome2, ...] }
             infortunati: {}, // { nomeCalciatore: { descrizione: '...', dataRientro: '...' } }
             config: {
@@ -2791,7 +3004,19 @@
             const savedAcquistati = keyAcq ? localStorage.getItem(keyAcq) : null;
             if (savedAcquistati) {
                 try {
-                    appData.acquistati = JSON.parse(savedAcquistati);
+                    const parsed = JSON.parse(savedAcquistati);
+                    // Migrazione: se i dati sono nel vecchio formato { nome: true }, convertili
+                    const migrated = {};
+                    Object.entries(parsed).forEach(([nome, value]) => {
+                        if (value === true) {
+                            // Vecchio formato - converti con valori di default
+                            migrated[nome] = { nome, squadra: 'Sconosciuta', costo: 0, id: 0 };
+                        } else if (value && typeof value === 'object') {
+                            // Nuovo formato
+                            migrated[nome] = value;
+                        }
+                    });
+                    appData.acquistati = migrated;
                     console.log(`Caricati ${Object.keys(appData.acquistati).length} giocatori acquistati da altri`);
                 } catch (e) {
                     appData.acquistati = {};
@@ -3527,6 +3752,7 @@
             renderSvincolatiTables();
             updateTotaleLega();
             updateRiepilogoSvincoli();
+            updateRiepilogoAcquisti();
             setupQuickSearch();
             setupMercatoUpload();
             setupInfortunatiUpload();
@@ -3564,7 +3790,8 @@
                 const budgetBase = appData.config.budgetSquadre[sq] || 0;
                 const creditiAgg = appData.config.creditiAggiuntivi;
                 const creditiRecuperati = calcCreditiRecuperatiSquadra(sq);
-                const totale = budgetBase + creditiAgg + creditiRecuperati;
+                const creditiSpesi = calcCreditiSpesiSquadra(sq);
+                const totale = budgetBase + creditiAgg + creditiRecuperati - creditiSpesi;
                 
                 return `
                     <div class="budget-card">
@@ -3581,8 +3808,14 @@
                             <span>Crediti recuperati:</span>
                             <span>+${creditiRecuperati}</span>
                         </div>
+                        ${creditiSpesi > 0 ? `
+                        <div class="budget-row" style="color: var(--danger)">
+                            <span>Acquisti riparaz.:</span>
+                            <span>-${creditiSpesi}</span>
+                        </div>
+                        ` : ''}
                         <div class="budget-row total">
-                            <span>BUDGET TOTALE:</span>
+                            <span>BUDGET DISPONIBILE:</span>
                             <span class="value">${totale}</span>
                         </div>
                     </div>
@@ -3598,6 +3831,17 @@
                 }
                 return sum;
             }, 0);
+        }
+        
+        function calcCreditiSpesiSquadra(squadra) {
+            // Somma i costi di tutti gli acquisti fatti da questa squadra
+            let totale = 0;
+            Object.values(appData.acquistati).forEach(acq => {
+                if (acq.squadra === squadra) {
+                    totale += acq.costo || 0;
+                }
+            });
+            return totale;
         }
         
         function calcRimborso(costo, isFuoriLista = false) {
@@ -4626,7 +4870,7 @@
                 if (rilasciatiFilter === '1' && !c.rilasciatoDa) return false;
                 if (rilasciatiFilter === '0' && c.rilasciatoDa) return false;
                 // Filtro acquistati
-                const isAcquistato = appData.acquistati[c.nome] || false;
+                const isAcquistato = !!appData.acquistati[c.nome];
                 if (acquistatiFilter === '0' && isAcquistato) return false;
                 if (acquistatiFilter === '1' && !isAcquistato) return false;
                 // Filtro infortunati
@@ -4645,7 +4889,7 @@
                 ...cal,
                 preferenza: appData.preferenze[cal.nome] || 0,
                 isNuovo: isNuovoArrivo(cal.nome, cal.squadra),
-                isAcquistato: appData.acquistati[cal.nome] || false,
+                isAcquistato: !!appData.acquistati[cal.nome],
                 infortunatoInfo: isInfortunato(cal.nome)
             }));
             
@@ -4699,6 +4943,8 @@
                             const playerUrl = buildFantacalcioUrl(cal.nome, cal.squadra, cal.id);
                             const playerLink = playerUrl ? `<a href="${playerUrl}" target="_blank" class="player-info-link" title="Vedi su Fantacalcio.it">🔍</a>` : '';
                             const titolaritaBtn = playerUrl ? `<button class="player-titolarita-btn" onclick="loadPlayerTitolarita(this, '${playerUrl}', '${cal.nome.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Analizza titolarità">📊 Titolarità</button>` : '';
+                            const acquistoInfo = cal.isAcquistato ? appData.acquistati[cal.nome] : null;
+                            const acquistoLabel = acquistoInfo ? `${acquistoInfo.squadra} (${acquistoInfo.costo}cr)` : '';
                             return `
                             <tr class="${cal.preferenza > 0 ? 'preferito' : ''}${cal.isNuovo ? ' nuovo-arrivo' : ''}${cal.rilasciatoDa ? ' rilasciato' : ''}${cal.isAcquistato ? ' acquistato' : ''}${cal.infortunatoInfo ? ' infortunato' : ''}">
                                 <td class="stars-cell no-strike">
@@ -4709,7 +4955,7 @@
                                     ${cal.nome}${playerLink}${titolaritaBtn}
                                     ${cal.isNuovo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}
                                     ${cal.rilasciatoDa ? `<span class="rilasciato-badge" title="Rilasciato da ${cal.rilasciatoDa}">🔓 ${cal.rilasciatoDa}</span>` : ''}
-                                    ${cal.isAcquistato ? '<span class="acquistato-badge">PRESO</span>' : ''}
+                                    ${cal.isAcquistato ? `<span class="acquistato-badge" title="Acquistato da ${acquistoLabel}">→ ${acquistoLabel}</span>` : ''}
                                     ${cal.infortunatoInfo ? `<span class="infortunato-badge" data-tooltip="${cal.infortunatoInfo.descrizione}">🏥 INF</span>` : ''}
                                 </td>
                                 <td>${cal.squadra}</td>
@@ -4721,9 +4967,9 @@
                                 <td>${cal.indiceAffidabilita.toFixed(2)}</td>
                                 <td class="no-strike">
                                     <button class="btn-acquistato ${cal.isAcquistato ? 'active' : ''}" 
-                                            onclick="toggleAcquistato('${cal.nome.replace(/'/g, "\\'")}')"
-                                            title="${cal.isAcquistato ? 'Segna come disponibile' : 'Segna come preso da altri'}">
-                                        ${cal.isAcquistato ? '✅' : '❌'}
+                                            onclick="toggleAcquistato('${cal.nome.replace(/'/g, "\\'")}', ${cal.id}, '${cal.squadra.replace(/'/g, "\\'")}')"
+                                            title="${cal.isAcquistato ? 'Modifica/rimuovi acquisto' : 'Registra acquisto'}">
+                                        ${cal.isAcquistato ? '✏️' : '🛒'}
                                     </button>
                                 </td>
                             </tr>
@@ -4758,19 +5004,166 @@
             renderSvincolatiTable(ruolo, tabId, sort.col, sort.dir);
         }
         
-        function toggleAcquistato(nome) {
-            if (appData.acquistati[nome]) {
-                delete appData.acquistati[nome];
-            } else {
-                appData.acquistati[nome] = true;
+        function toggleAcquistato(nome, id, squadraSerieA) {
+            // Se già acquistato, apri il modal per modificare/rimuovere
+            // Altrimenti apri il modal per registrare l'acquisto
+            openAcquistoModal(nome, id, squadraSerieA);
+        }
+        
+        function openAcquistoModal(nome, id, squadraSerieA) {
+            // Rimuovi eventuali modal esistenti
+            closeAcquistoModal();
+            
+            const existingAcquisto = appData.acquistati[nome];
+            const isEdit = !!existingAcquisto;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'acquisto-modal-overlay';
+            overlay.onclick = (e) => { if (e.target === overlay) closeAcquistoModal(); };
+            
+            const squadreOptions = Object.keys(appData.squadre).sort().map(sq => 
+                `<option value="${sq}" ${existingAcquisto?.squadra === sq ? 'selected' : ''}>${sq}</option>`
+            ).join('');
+            
+            const modal = document.createElement('div');
+            modal.className = 'acquisto-modal';
+            modal.innerHTML = `
+                <h3>${isEdit ? '✏️ Modifica Acquisto' : '🛒 Registra Acquisto'}</h3>
+                <div class="player-name">${nome}</div>
+                ${squadraSerieA ? `<div style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">Squadra Serie A: ${squadraSerieA}</div>` : ''}
+                
+                <div class="form-group">
+                    <label>Squadra che acquista</label>
+                    <select id="acquisto-squadra">
+                        <option value="">-- Seleziona squadra --</option>
+                        ${squadreOptions}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Prezzo d'acquisto</label>
+                    <input type="number" id="acquisto-costo" min="1" placeholder="Crediti" value="${existingAcquisto?.costo || ''}">
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-cancel" onclick="closeAcquistoModal()">Annulla</button>
+                    ${isEdit ? `<button class="btn-remove" onclick="removeAcquisto('${nome.replace(/'/g, "\\'")}')">🗑️ Rimuovi</button>` : ''}
+                    <button class="btn-confirm" onclick="confirmAcquisto('${nome.replace(/'/g, "\\'")}', ${id})">
+                        ${isEdit ? '💾 Salva' : '✅ Conferma'}
+                    </button>
+                </div>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            // Focus sul primo campo
+            setTimeout(() => {
+                if (!existingAcquisto) {
+                    document.getElementById('acquisto-squadra').focus();
+                } else {
+                    document.getElementById('acquisto-costo').focus();
+                }
+            }, 100);
+        }
+        
+        function closeAcquistoModal() {
+            const overlay = document.querySelector('.acquisto-modal-overlay');
+            if (overlay) overlay.remove();
+        }
+        
+        function confirmAcquisto(nome, id) {
+            const squadra = document.getElementById('acquisto-squadra').value;
+            const costo = parseInt(document.getElementById('acquisto-costo').value);
+            
+            if (!squadra) {
+                alert('Seleziona una squadra');
+                return;
             }
+            if (!costo || costo < 1) {
+                alert('Inserisci un prezzo valido (minimo 1)');
+                return;
+            }
+            
+            appData.acquistati[nome] = {
+                id: id,
+                nome: nome,
+                squadra: squadra,
+                costo: costo
+            };
+            
             saveAcquistati();
+            closeAcquistoModal();
+            renderBudgetCards();
             renderSvincolatiTables();
+            updateRiepilogoAcquisti();
+        }
+        
+        function removeAcquisto(nome) {
+            delete appData.acquistati[nome];
+            saveAcquistati();
+            closeAcquistoModal();
+            renderBudgetCards();
+            renderSvincolatiTables();
+            updateRiepilogoAcquisti();
         }
         
         function saveAcquistati() {
             const key = getStorageKey('acquistati');
             if (key) localStorage.setItem(key, JSON.stringify(appData.acquistati));
+        }
+        
+        function updateRiepilogoAcquisti() {
+            const content = document.getElementById('riepilogo-acquisti-content');
+            const countSpan = document.getElementById('count-acquisti');
+            
+            if (!content || !countSpan) return;
+            
+            const acquisti = Object.values(appData.acquistati);
+            countSpan.textContent = acquisti.length;
+            
+            if (acquisti.length === 0) {
+                content.innerHTML = '<div class="riepilogo-empty">Nessun acquisto registrato</div>';
+            } else {
+                // Raggruppa per squadra acquirente
+                const perSquadra = {};
+                acquisti.forEach(acq => {
+                    if (!perSquadra[acq.squadra]) perSquadra[acq.squadra] = [];
+                    perSquadra[acq.squadra].push(acq);
+                });
+                
+                let html = '';
+                Object.keys(perSquadra).sort().forEach(squadra => {
+                    const acqSquadra = perSquadra[squadra];
+                    const totaleSquadra = acqSquadra.reduce((sum, a) => sum + a.costo, 0);
+                    
+                    html += `<div style="margin-bottom: 15px;">`;
+                    html += `<div style="font-weight: bold; color: var(--accent); margin-bottom: 8px; display: flex; justify-content: space-between;">
+                        <span>${squadra}</span>
+                        <span style="color: var(--success);">Totale: ${totaleSquadra} cr</span>
+                    </div>`;
+                    
+                    acqSquadra.forEach(acq => {
+                        html += `
+                            <div class="acquisto-item">
+                                <div class="acquisto-info">
+                                    <div class="acquisto-nome">${acq.nome}</div>
+                                </div>
+                                <div class="acquisto-costo">${acq.costo} cr</div>
+                                <button class="acquisto-remove" onclick="removeAcquisto('${acq.nome.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Rimuovi acquisto">✕</button>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                });
+                
+                content.innerHTML = html;
+            }
+        }
+        
+        function toggleRiepilogoAcquisti() {
+            const content = document.getElementById('riepilogo-acquisti-content');
+            content.classList.toggle('collapsed');
         }
         
         function filterTable(ruolo, tabId) {
