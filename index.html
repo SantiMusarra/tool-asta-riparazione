@@ -2168,12 +2168,24 @@
                 padding: 40px 20px;
             }
             
+            /* Header non sticky su mobile - occupa troppo spazio */
+            .header {
+                position: relative;
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            /* Tabs sticky in cima su mobile */
             .tabs {
                 padding: 0 5px;
                 gap: 5px;
                 flex-wrap: wrap;
                 justify-content: center;
-                top: 110px; /* header più alto su mobile */
+                position: sticky;
+                top: 0;
+                z-index: 99;
+                background: var(--bg-secondary);
             }
             
             .tab {
@@ -2183,12 +2195,6 @@
             
             .content {
                 padding: 15px;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
             }
             
             .header h1 {
@@ -2248,14 +2254,227 @@
                 text-align: center;
             }
             
-            /* Tabelle scrollabili orizzontalmente */
-            .table-wrapper {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+            /* Nascondi tabella su mobile, mostra card */
+            .svincolati-table-desktop {
+                display: none;
             }
             
-            .table-wrapper table {
-                min-width: 700px;
+            .svincolati-cards-mobile {
+                display: block;
+            }
+            
+            /* Card mobile styling */
+            .player-card {
+                background: var(--bg-card);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                border: 1px solid var(--border);
+                overflow: hidden;
+                transition: all 0.2s ease;
+            }
+            
+            .player-card.preferito {
+                border-color: var(--accent);
+                background: linear-gradient(135deg, var(--bg-card) 0%, rgba(108, 92, 231, 0.15) 100%);
+            }
+            
+            .player-card.acquistato {
+                opacity: 0.6;
+                border-color: var(--success);
+            }
+            
+            .player-card.infortunato {
+                border-left: 3px solid #9c27b0;
+            }
+            
+            .player-card-header {
+                padding: 12px 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+                background: linear-gradient(90deg, var(--bg-secondary), var(--bg-card));
+            }
+            
+            .player-card-header:active {
+                background: var(--bg-secondary);
+            }
+            
+            .player-card-main {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .player-card-name {
+                font-weight: bold;
+                font-size: 1rem;
+                color: var(--text-primary);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .player-card-name .badges {
+                display: inline-flex;
+                gap: 5px;
+                margin-left: 8px;
+                vertical-align: middle;
+            }
+            
+            .player-card-squadra {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                background: var(--bg-secondary);
+                padding: 2px 8px;
+                border-radius: 4px;
+                flex-shrink: 0;
+            }
+            
+            .player-card-stats {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+            
+            .player-card-stat {
+                text-align: center;
+                padding: 4px 8px;
+                background: var(--bg-secondary);
+                border-radius: 6px;
+                min-width: 45px;
+            }
+            
+            .player-card-stat .value {
+                font-weight: bold;
+                font-size: 0.95rem;
+                color: var(--accent);
+            }
+            
+            .player-card-stat .label {
+                font-size: 0.6rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+            }
+            
+            .player-card-stat.highlight .value {
+                color: var(--gold);
+            }
+            
+            .player-card-actions {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+            
+            .player-card-expand {
+                color: var(--text-secondary);
+                font-size: 1.2rem;
+                transition: transform 0.3s;
+                margin-left: 5px;
+            }
+            
+            .player-card.expanded .player-card-expand {
+                transform: rotate(180deg);
+            }
+            
+            .player-card-body {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
+                background: var(--bg-secondary);
+            }
+            
+            .player-card.expanded .player-card-body {
+                max-height: 600px;
+            }
+            
+            .player-card-details {
+                padding: 15px;
+            }
+            
+            .player-card-details-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .player-card-detail {
+                background: var(--bg-card);
+                padding: 10px;
+                border-radius: 8px;
+                text-align: center;
+            }
+            
+            .player-card-detail .value {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: var(--text-primary);
+            }
+            
+            .player-card-detail .label {
+                font-size: 0.7rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                margin-top: 3px;
+            }
+            
+            .player-card-bottom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 12px;
+                border-top: 1px solid var(--border);
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .player-card-stars {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+            }
+            
+            .player-card-stars .star {
+                font-size: 1.4rem;
+                padding: 5px;
+            }
+            
+            .player-card-links {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+            
+            .player-card-links a,
+            .player-card-links button {
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 0.85rem;
+            }
+            
+            .player-card .btn-acquistato {
+                padding: 10px 16px;
+                font-size: 1rem;
+                background: var(--success);
+                color: white;
+                border: none;
+            }
+            
+            .player-card .btn-acquistato.active {
+                background: var(--warning);
+                color: #000;
+            }
+            
+            .player-card-info-badges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-bottom: 12px;
             }
             
             .squadra-table-container {
@@ -2264,6 +2483,134 @@
             
             .squadra-table-container table {
                 min-width: 500px;
+            }
+            
+            /* Titolarità popup mobile - più compatto */
+            .titolarita-popup {
+                padding: 15px;
+                min-width: auto;
+                max-width: 95vw;
+                width: 95vw;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .titolarita-popup h3 {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+            }
+            
+            .titolarita-stats {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+            
+            .titolarita-stat {
+                padding: 8px 4px;
+                border-radius: 6px;
+            }
+            
+            .titolarita-stat .value {
+                font-size: 1.3rem;
+            }
+            
+            .titolarita-stat .label {
+                font-size: 0.55rem;
+                margin-top: 3px;
+            }
+            
+            .titolarita-trend {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .titolarita-trend h4 {
+                font-size: 0.65rem;
+                margin-bottom: 8px;
+            }
+            
+            .trend-indicator {
+                font-size: 0.85rem;
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            .trend-icon {
+                font-size: 1.2rem;
+            }
+            
+            .trend-reasons {
+                font-size: 0.7rem;
+                line-height: 1.4;
+            }
+            
+            .recent-games {
+                padding: 8px;
+                margin-top: 8px;
+            }
+            
+            .recent-games-title {
+                font-size: 0.65rem;
+                margin-bottom: 6px;
+            }
+            
+            .recent-games-icons {
+                font-size: 1rem;
+                gap: 4px;
+            }
+            
+            .recent-games-label {
+                font-size: 0.6rem;
+            }
+            
+            .titolarita-detail {
+                padding: 10px;
+            }
+            
+            .titolarita-detail-title {
+                font-size: 0.65rem;
+                margin-bottom: 8px;
+            }
+            
+            .stats-breakdown {
+                gap: 6px;
+                margin-bottom: 10px;
+            }
+            
+            .stat-bar-item {
+                padding: 6px 8px;
+            }
+            
+            .stat-bar-label {
+                font-size: 0.6rem;
+            }
+            
+            .stat-bar-value {
+                font-size: 0.75rem;
+            }
+            
+            .giornate-strip {
+                gap: 3px;
+                padding: 8px;
+                margin-top: 8px;
+            }
+            
+            .giornata-dot {
+                width: 18px;
+                height: 18px;
+                font-size: 0.55rem;
+            }
+        }
+
+        /* Desktop: mostra tabella, nascondi card */
+        @media (min-width: 769px) {
+            .svincolati-table-desktop {
+                display: block;
+            }
+            
+            .svincolati-cards-mobile {
+                display: none;
             }
         }
         
@@ -2287,6 +2634,58 @@
             
             .disclaimer {
                 font-size: 0.8rem;
+            }
+            
+            /* Card ancora più compatte su schermi piccoli */
+            .player-card-header {
+                padding: 10px 12px;
+            }
+            
+            .player-card-name {
+                font-size: 0.9rem;
+            }
+            
+            .player-card-stat {
+                padding: 3px 6px;
+                min-width: 40px;
+            }
+            
+            .player-card-stat .value {
+                font-size: 0.85rem;
+            }
+            
+            .player-card-stat .label {
+                font-size: 0.55rem;
+            }
+            
+            .player-card-details {
+                padding: 12px;
+            }
+            
+            .player-card-details-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .player-card-bottom {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .player-card-stars {
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+            
+            .player-card-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .player-card-links a,
+            .player-card-links button {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
             }
         }
     </style>
@@ -4924,58 +5323,185 @@
                 { key: 'azione', label: '❌' }
             ];
             
+            // Genera HTML per la tabella desktop
+            const tableHtml = `
+                <div class="svincolati-table-desktop">
+                    <table>
+                        <thead>
+                            <tr>
+                                ${columns.map(col => `
+                                    <th class="${sortCol === col.key ? 'sorted' : ''}" 
+                                        onclick="sortSvincolatiTable('${ruolo}', '${tabId}', '${col.key}', '${sortCol === col.key && sortDir === 'desc' ? 'asc' : 'desc'}')">
+                                        ${col.label}
+                                        <span class="sort-icon">${sortCol === col.key ? (sortDir === 'desc' ? '▼' : '▲') : '↕'}</span>
+                                    </th>
+                                `).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(cal => {
+                                const playerUrl = buildFantacalcioUrl(cal.nome, cal.squadra, cal.id);
+                                const playerLink = playerUrl ? `<a href="${playerUrl}" target="_blank" class="player-info-link" title="Vedi su Fantacalcio.it">🔍</a>` : '';
+                                const titolaritaBtn = playerUrl ? `<button class="player-titolarita-btn" onclick="loadPlayerTitolarita(this, '${playerUrl}', '${cal.nome.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Analizza titolarità">📊 Titolarità</button>` : '';
+                                const acquistoInfo = cal.isAcquistato ? appData.acquistati[cal.nome] : null;
+                                const acquistoLabel = acquistoInfo ? `${acquistoInfo.squadra} (${acquistoInfo.costo}cr)` : '';
+                                return `
+                                <tr class="${cal.preferenza > 0 ? 'preferito' : ''}${cal.isNuovo ? ' nuovo-arrivo' : ''}${cal.rilasciatoDa ? ' rilasciato' : ''}${cal.isAcquistato ? ' acquistato' : ''}${cal.infortunatoInfo ? ' infortunato' : ''}">
+                                    <td class="stars-cell no-strike">
+                                        ${renderStars(cal.nome, cal.preferenza, ruolo, tabId)}
+                                    </td>
+                                    <td>${cal.id}</td>
+                                    <td>
+                                        ${cal.nome}${playerLink}${titolaritaBtn}
+                                        ${cal.isNuovo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}
+                                        ${cal.rilasciatoDa ? `<span class="rilasciato-badge" title="Rilasciato da ${cal.rilasciatoDa}">🔓 ${cal.rilasciatoDa}</span>` : ''}
+                                        ${cal.isAcquistato ? `<span class="acquistato-badge" title="Acquistato da ${acquistoLabel}">→ ${acquistoLabel}</span>` : ''}
+                                        ${cal.infortunatoInfo ? `<span class="infortunato-badge" data-tooltip="${cal.infortunatoInfo.descrizione}">🏥 INF</span>` : ''}
+                                    </td>
+                                    <td>${cal.squadra}</td>
+                                    <td>${cal.pgv}</td>
+                                    <td>${cal.mv.toFixed(2)}</td>
+                                    <td>${cal.fm.toFixed(2)}</td>
+                                    <td>${cal.fvm.toFixed(2)}</td>
+                                    <td>${cal.quot}</td>
+                                    <td>${cal.indiceAffidabilita.toFixed(2)}</td>
+                                    <td class="no-strike">
+                                        <button class="btn-acquistato ${cal.isAcquistato ? 'active' : ''}" 
+                                                onclick="toggleAcquistato('${cal.nome.replace(/'/g, "\\'")}', ${cal.id}, '${cal.squadra.replace(/'/g, "\\'")}')"
+                                                title="${cal.isAcquistato ? 'Modifica/rimuovi acquisto' : 'Registra acquisto'}">
+                                            ${cal.isAcquistato ? '✏️' : '🛒'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            // Genera HTML per le card mobile
+            const cardsHtml = `
+                <div class="svincolati-cards-mobile">
+                    <!-- Ordinamento mobile -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                        <select onchange="sortSvincolatiTable('${ruolo}', '${tabId}', this.value.split('|')[0], this.value.split('|')[1])" style="flex: 1; padding: 10px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary);">
+                            <option value="fm|desc" ${sortCol === 'fm' && sortDir === 'desc' ? 'selected' : ''}>FM ↓</option>
+                            <option value="fm|asc" ${sortCol === 'fm' && sortDir === 'asc' ? 'selected' : ''}>FM ↑</option>
+                            <option value="fvm|desc" ${sortCol === 'fvm' && sortDir === 'desc' ? 'selected' : ''}>FVM ↓</option>
+                            <option value="fvm|asc" ${sortCol === 'fvm' && sortDir === 'asc' ? 'selected' : ''}>FVM ↑</option>
+                            <option value="quot|desc" ${sortCol === 'quot' && sortDir === 'desc' ? 'selected' : ''}>Quot. ↓</option>
+                            <option value="quot|asc" ${sortCol === 'quot' && sortDir === 'asc' ? 'selected' : ''}>Quot. ↑</option>
+                            <option value="pgv|desc" ${sortCol === 'pgv' && sortDir === 'desc' ? 'selected' : ''}>PGv ↓</option>
+                            <option value="nome|asc" ${sortCol === 'nome' && sortDir === 'asc' ? 'selected' : ''}>Nome A-Z</option>
+                            <option value="preferenza|desc" ${sortCol === 'preferenza' && sortDir === 'desc' ? 'selected' : ''}>⭐ Preferiti</option>
+                        </select>
+                    </div>
+                    
+                    ${data.map((cal, index) => {
+                        const playerUrl = buildFantacalcioUrl(cal.nome, cal.squadra, cal.id);
+                        const acquistoInfo = cal.isAcquistato ? appData.acquistati[cal.nome] : null;
+                        const acquistoLabel = acquistoInfo ? `${acquistoInfo.squadra} (${acquistoInfo.costo}cr)` : '';
+                        const cardId = `card-${tabId}-${index}`;
+                        
+                        return `
+                        <div class="player-card ${cal.preferenza > 0 ? 'preferito' : ''} ${cal.isAcquistato ? 'acquistato' : ''} ${cal.infortunatoInfo ? 'infortunato' : ''}" id="${cardId}">
+                            <div class="player-card-header" onclick="togglePlayerCard('${cardId}')">
+                                <div class="player-card-main">
+                                    <div>
+                                        <div class="player-card-name">
+                                            ${cal.nome}
+                                            <span class="badges">
+                                                ${cal.preferenza > 0 ? `<span style="color: var(--gold);">${'★'.repeat(cal.preferenza)}</span>` : ''}
+                                                ${cal.isNuovo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}
+                                                ${cal.infortunatoInfo ? '<span style="color: #9c27b0;">🏥</span>' : ''}
+                                            </span>
+                                        </div>
+                                        <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                                            <span class="player-card-squadra">${cal.squadra}</span>
+                                            ${cal.rilasciatoDa ? `<span style="font-size: 0.75rem; color: var(--warning);">🔓 ${cal.rilasciatoDa}</span>` : ''}
+                                            ${cal.isAcquistato ? `<span style="font-size: 0.75rem; color: var(--success);">→ ${acquistoLabel}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="player-card-stats">
+                                    <div class="player-card-stat highlight">
+                                        <div class="value">${cal.fm.toFixed(1)}</div>
+                                        <div class="label">FM</div>
+                                    </div>
+                                    <div class="player-card-stat">
+                                        <div class="value">${cal.pgv}</div>
+                                        <div class="label">PGv</div>
+                                    </div>
+                                    <span class="player-card-expand">▼</span>
+                                </div>
+                            </div>
+                            <div class="player-card-body">
+                                <div class="player-card-details">
+                                    ${cal.infortunatoInfo ? `
+                                        <div class="player-card-info-badges">
+                                            <span style="background: rgba(156, 39, 176, 0.2); color: #ce93d8; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem;">
+                                                🏥 ${cal.infortunatoInfo.descrizione}
+                                            </span>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    <div class="player-card-details-grid">
+                                        <div class="player-card-detail">
+                                            <div class="value">${cal.pgv}</div>
+                                            <div class="label">PGv</div>
+                                        </div>
+                                        <div class="player-card-detail">
+                                            <div class="value">${cal.mv.toFixed(2)}</div>
+                                            <div class="label">MV</div>
+                                        </div>
+                                        <div class="player-card-detail">
+                                            <div class="value" style="color: var(--gold);">${cal.fvm.toFixed(2)}</div>
+                                            <div class="label">FVM/1000</div>
+                                        </div>
+                                        <div class="player-card-detail">
+                                            <div class="value">${cal.quot}</div>
+                                            <div class="label">Quotaz.</div>
+                                        </div>
+                                        <div class="player-card-detail">
+                                            <div class="value">${cal.indiceAffidabilita.toFixed(1)}</div>
+                                            <div class="label">Affidab.</div>
+                                        </div>
+                                        <div class="player-card-detail">
+                                            <div class="value" style="font-size: 0.9rem; color: var(--text-secondary);">#${cal.id}</div>
+                                            <div class="label">ID</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="player-card-bottom">
+                                        <div class="player-card-stars">
+                                            ${renderStarsMobile(cal.nome, cal.preferenza, ruolo, tabId)}
+                                        </div>
+                                        <div class="player-card-links">
+                                            ${playerUrl ? `
+                                                <a href="${playerUrl}" target="_blank" style="background: var(--bg-card); color: var(--accent); text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem;">
+                                                    🔍 Scheda
+                                                </a>
+                                                <button class="player-titolarita-btn" onclick="loadPlayerTitolarita(this, '${playerUrl}', '${cal.nome.replace(/'/g, "\\'")}'); event.stopPropagation();" style="padding: 8px 12px;">
+                                                    📊 Titolarità
+                                                </button>
+                                            ` : ''}
+                                            <button class="btn-acquistato ${cal.isAcquistato ? 'active' : ''}" 
+                                                    onclick="toggleAcquistato('${cal.nome.replace(/'/g, "\\'")}', ${cal.id}, '${cal.squadra.replace(/'/g, "\\'")}'); event.stopPropagation();">
+                                                ${cal.isAcquistato ? '✏️ Modifica' : '🛒 Acquista'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;}).join('')}
+                </div>
+            `;
+            
             container.innerHTML = `
                 <p style="margin-bottom: 10px; color: var(--text-secondary)">Trovati: ${data.length} calciatori</p>
-                <table>
-                    <thead>
-                        <tr>
-                            ${columns.map(col => `
-                                <th class="${sortCol === col.key ? 'sorted' : ''}" 
-                                    onclick="sortSvincolatiTable('${ruolo}', '${tabId}', '${col.key}', '${sortCol === col.key && sortDir === 'desc' ? 'asc' : 'desc'}')">
-                                    ${col.label}
-                                    <span class="sort-icon">${sortCol === col.key ? (sortDir === 'desc' ? '▼' : '▲') : '↕'}</span>
-                                </th>
-                            `).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.map(cal => {
-                            const playerUrl = buildFantacalcioUrl(cal.nome, cal.squadra, cal.id);
-                            const playerLink = playerUrl ? `<a href="${playerUrl}" target="_blank" class="player-info-link" title="Vedi su Fantacalcio.it">🔍</a>` : '';
-                            const titolaritaBtn = playerUrl ? `<button class="player-titolarita-btn" onclick="loadPlayerTitolarita(this, '${playerUrl}', '${cal.nome.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Analizza titolarità">📊 Titolarità</button>` : '';
-                            const acquistoInfo = cal.isAcquistato ? appData.acquistati[cal.nome] : null;
-                            const acquistoLabel = acquistoInfo ? `${acquistoInfo.squadra} (${acquistoInfo.costo}cr)` : '';
-                            return `
-                            <tr class="${cal.preferenza > 0 ? 'preferito' : ''}${cal.isNuovo ? ' nuovo-arrivo' : ''}${cal.rilasciatoDa ? ' rilasciato' : ''}${cal.isAcquistato ? ' acquistato' : ''}${cal.infortunatoInfo ? ' infortunato' : ''}">
-                                <td class="stars-cell no-strike">
-                                    ${renderStars(cal.nome, cal.preferenza, ruolo, tabId)}
-                                </td>
-                                <td>${cal.id}</td>
-                                <td>
-                                    ${cal.nome}${playerLink}${titolaritaBtn}
-                                    ${cal.isNuovo ? '<span class="nuovo-arrivo-badge">NEW</span>' : ''}
-                                    ${cal.rilasciatoDa ? `<span class="rilasciato-badge" title="Rilasciato da ${cal.rilasciatoDa}">🔓 ${cal.rilasciatoDa}</span>` : ''}
-                                    ${cal.isAcquistato ? `<span class="acquistato-badge" title="Acquistato da ${acquistoLabel}">→ ${acquistoLabel}</span>` : ''}
-                                    ${cal.infortunatoInfo ? `<span class="infortunato-badge" data-tooltip="${cal.infortunatoInfo.descrizione}">🏥 INF</span>` : ''}
-                                </td>
-                                <td>${cal.squadra}</td>
-                                <td>${cal.pgv}</td>
-                                <td>${cal.mv.toFixed(2)}</td>
-                                <td>${cal.fm.toFixed(2)}</td>
-                                <td>${cal.fvm.toFixed(2)}</td>
-                                <td>${cal.quot}</td>
-                                <td>${cal.indiceAffidabilita.toFixed(2)}</td>
-                                <td class="no-strike">
-                                    <button class="btn-acquistato ${cal.isAcquistato ? 'active' : ''}" 
-                                            onclick="toggleAcquistato('${cal.nome.replace(/'/g, "\\'")}', ${cal.id}, '${cal.squadra.replace(/'/g, "\\'")}')"
-                                            title="${cal.isAcquistato ? 'Modifica/rimuovi acquisto' : 'Registra acquisto'}">
-                                        ${cal.isAcquistato ? '✏️' : '🛒'}
-                                    </button>
-                                </td>
-                            </tr>
-                        `;}).join('')}
-                    </tbody>
-                </table>
+                ${tableHtml}
+                ${cardsHtml}
             `;
         }
         
@@ -4990,6 +5516,25 @@
             }
             html += '</div>';
             return html;
+        }
+        
+        function renderStarsMobile(nome, current, ruolo, tabId) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                const filled = i <= current;
+                html += `<span class="star ${filled ? 'filled' : ''}" onclick="setPreferenza('${nome.replace(/'/g, "\\'")}', ${i}, '${ruolo}', '${tabId}'); event.stopPropagation();">${filled ? '★' : '☆'}</span>`;
+            }
+            if (current > 0) {
+                html += `<span class="star-clear" onclick="setPreferenza('${nome.replace(/'/g, "\\'")}', 0, '${ruolo}', '${tabId}'); event.stopPropagation();" title="Rimuovi">✕</span>`;
+            }
+            return html;
+        }
+        
+        function togglePlayerCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.toggle('expanded');
+            }
         }
         
         function setPreferenza(nome, value, ruolo, tabId) {
